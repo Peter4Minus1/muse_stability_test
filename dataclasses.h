@@ -48,7 +48,7 @@ public:
 
 class QDC : public UpDown {
 public:
-    void set_data(int run, std::string detector);
+    void set_data(int run, std::string directory, std::string detector);
 };
 
 class Run : public QDC {

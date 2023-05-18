@@ -47,8 +47,8 @@ std::vector<float> UpDown::std_err(char type) {
 	return sd;
 }
 
-void QDC::set_data(int run, std::string detector) {
-    std::string file_name = Form("/home/peter4minus1/runs/run%d_SPS_monitor.root", run);
+void QDC::set_data(int run, std::string directory, std::string detector) {
+    std::string file_name = directory + Form("/run%d_SPS_monitor.root", run);
     TFile* datafile = new TFile(file_name.c_str(), "READ");
     
     std::vector<float> u = {};
