@@ -57,7 +57,7 @@ private:
 public:
     Run(int num);
     void set_run(int n);
-    int get_run();
+    int get_number();
 };
 
 void convert(std::vector<float> v, float_t* a, int n);

@@ -38,16 +38,17 @@ int main(int argc, char *argv[]) {
     }
 
 
-    std::vector<int> runs = {};//{14495,14497,14513,14516,14520,14530,14535,14539,14547,14550,14555,14560,14564,14565,14566};
+    std::vector<Run> runs = {};//{14495,14497,14513,14516,14520,14530,14535,14539,14547,14550,14555,14560,14564,14565,14566};
 
     for (int r = minrun; r <= maxrun; r++) {
         //std::cout << r;
         std::string filename = directory + Form("/run%d_SPS_monitor.root", r);
         TFile f(filename.c_str());
         if (!(f.IsZombie())) {
-            runs.push_back(r);   
+            runs.push_back(Run(r));
             std::cout << r << std::endl;
-        }
+        } 
+        f.Close();
     }
     
     std::vector<std::string> detectors = {"SPSLF", "SPSRF", "SPSLR", "SPSRR"};
@@ -56,7 +57,7 @@ int main(int argc, char *argv[]) {
     const int n = runs.size();
 
     //QDC means graph
-    Run current_run = Run(runs[0]);
+    Run current_run = runs[0];
     auto c1 = new TCanvas("c1", "QDC Mean Values", 1200, 2400);
 
     
@@ -81,8 +82,8 @@ int main(int argc, char *argv[]) {
         for (int b = 0; b < bars; b++) {
             for (int i = 0; i < runs.size(); i++) {
                 current_run = Run(runs[i]);
-                current_run.QDC::set_data(runs[i], directory, detector);
-                x[i] = runs[i];
+                current_run.QDC::set_data(runs[i].get_number(), directory, detector);
+                x[i] = runs[i].get_number();
                 up[i] = current_run.up.get_means()[b];
                 up_err[i] = current_run.up.get_errors()[b];
                 down[i] = current_run.down.get_means()[b];
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]) {
         gr2->SetMarkerStyle(21);
         mg->Add(gr2);
         mg->SetTitle(Form("QDC %s Bar %d;Run;Mean QDC", ds, b));
-        c1->cd(b+1); mg->Draw("ALP");
+        c1->cd(b+1); mg->Draw("AL");
 
         auto leg = new TLegend(0.15,0.75,0.3,0.85);
         leg->AddEntry("up","Up","l");
@@ -114,10 +115,10 @@ int main(int argc, char *argv[]) {
         } else if (calculation == "ratio") {
         for (int b = 0; b < bars; b++) {
             for (int i = 0; i < runs.size(); i++) {
-                current_run = Run(runs[i]);
-                current_run.QDC::set_data(runs[i], directory, detector);
+                current_run = runs[i];
+                current_run.QDC::set_data(runs[i].get_number(), directory, detector);
                 current_run.QDC::set_ratios();
-                x[i] = runs[i];
+                x[i] = runs[i].get_number();
                 up[i] = current_run.QDC::get_ratios()[b];
                 up_err[i] = current_run.QDC::std_err('r')[b];
             }
@@ -125,7 +126,7 @@ int main(int argc, char *argv[]) {
         gr1->SetMarkerSize(.5);
         gr1->SetMarkerStyle(21); 
         gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %d;Run;QDC Ratio", ds, b));
-        c1->cd(b+1); gr1->Draw("ALP");
+        c1->cd(b+1); gr1->Draw("AL");
 
 
         float sum=0;

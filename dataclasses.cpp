@@ -90,7 +90,7 @@ Run::Run(int num) {
     set_run(num);
 }
 void Run::set_run(int n) {run_num = n;}
-int Run::get_run() {return run_num;}
+int Run::get_number() {return run_num;}
 
 
 
