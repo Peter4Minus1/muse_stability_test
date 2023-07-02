@@ -60,14 +60,16 @@ int main(int argc, char *argv[]) {
     Run current_run = runs[0];
     auto c1 = new TCanvas("c1", "QDC Mean Values", 1200, 2400);
 
-    
-    
-
+    std::cout << "Root file about to create";
+    std::unique_ptr<TFile> AllGraphs( TFile::Open("StabilityTest.root", "RECREATE") );
+    std::cout << "Root file created";
     for (int d = 0; d<4; d++) {
         detector = detectors[d];
         const char* ds = detector.data();
         if (detector == "SPSLF" | detector == "SPSRF") {bars = 18; c1->Divide(3,6);}
         else {bars = 28;c1->Divide(4,7);} 
+
+        auto detector_folder = AllGraphs->mkdir(ds,ds);
 
         const int n = runs.size();
         float_t x[n];
@@ -77,8 +79,9 @@ int main(int argc, char *argv[]) {
         float_t down_err[n];
 
         std::vector<float> errs = {};
+        
+        auto means = detector_folder->mkdir("means", "QDC Historgram Means");
 
-        if (calculation == "mean") {
         for (int b = 0; b < bars; b++) {
             for (int i = 0; i < runs.size(); i++) {
                 current_run = Run(runs[i]);
@@ -111,8 +114,14 @@ int main(int argc, char *argv[]) {
         leg->AddEntry("up","Up","l");
         leg->AddEntry("down","Down","l");
         leg->Draw();
+
+        auto updown = means->mkdir(Form("Bar%02d", b),Form("Bar%02d", b));
+        updown->WriteObject(gr1, "Up" );
+        updown->WriteObject(gr2, "Down");
         }
-        } else if (calculation == "ratio") {
+
+        auto ratios = detector_folder->mkdir("ratios", "QDC Up-Down Ratios");
+
         for (int b = 0; b < bars; b++) {
             for (int i = 0; i < runs.size(); i++) {
                 current_run = runs[i];
@@ -141,17 +150,16 @@ int main(int argc, char *argv[]) {
         float stddev = pow(Sr/bars, 0.5);
         float err = stddev/pow(bars, 0.5);
         errs.push_back(err);
+        
+        ratios->WriteObject(gr1, Form("Bar%02d", b));
         }
-        }
-    c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
+
+    //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
     c1->Clear();
-    for (int i = 0; i<errs.size(); i++) {
-        std::cout << errs[i];
-    }
     }
 c1->Close();
 
-
+//std::unique_ptr<TFile> myFile( TFile::Open("file.root", "RECREATE") );
 
 
 }
