@@ -1,0 +1,3 @@
+/home/peter4minus1/muse_stability_test/source/CMakeFiles/muse_stability_test.dir
+/home/peter4minus1/muse_stability_test/source/CMakeFiles/edit_cache.dir
+/home/peter4minus1/muse_stability_test/source/CMakeFiles/rebuild_cache.dir
