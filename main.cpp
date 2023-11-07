@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
 
     for (int r = minrun; r <= maxrun; r++) {
         //std::cout << r;
-        std::string filename = directory + Form("/run%d_SPS_monitor.root", r);
+        std::string filename = directory + Form("/run%d.root", r);
         TFile f(filename.c_str());
         if (!(f.IsZombie())) {
             runs.push_back(Run(r));

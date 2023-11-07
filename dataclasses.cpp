@@ -54,7 +54,7 @@ void Gain::set_R(std::vector<float> a) {R_values = a;}
 
 
 void QDC::set_data(int run, std::string directory, std::string detector) {
-    std::string file_name = directory + Form("/run%d_SPS_monitor.root", run);
+    std::string file_name = directory + Form("/run%d.root", run);
     TFile* datafile = new TFile(file_name.c_str(), "READ");
     
     std::vector<float> u = {};
