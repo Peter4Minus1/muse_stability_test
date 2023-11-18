@@ -75,7 +75,8 @@ int main(int argc, char *argv[]) {
 
         auto detector_folder = AllGraphs->mkdir(ds,ds);
         
-        errorLog.open(Form("%sErrorLog.txt", ds));
+        errorLog.open(Form("ErrorLog.csv", ds));
+        errorLog << "Detector,Run,Bar,Data,Error Type\n"
 
         const int n = runs.size();
         float_t x[n];
@@ -165,7 +166,6 @@ int main(int argc, char *argv[]) {
 
 
         for (int b = 0; b<bars; b++)   {
-            errorLog << "Bar " << b << std::endl;
             float_t R[n];
             std::vector<float> bad_runs = {};
             std::vector<float> bad_data = {};
@@ -178,13 +178,13 @@ int main(int argc, char *argv[]) {
                 if (Rx == 1.0){
                     null_data.push_back(0.0);
                     null_runs.push_back(current_run.get_number());
-                    errorLog << Form("\tRun %d returns NULL\n",current_run.get_number());
+                    errorLog << Form("%s,%d,%02d,R attenuation,returns NULL\n", ds, current_run.get_number(),b);
                 } else {
                     
                     if (abs(Rx) > .1){
                         bad_data.push_back(0.1 * Rx/abs(Rx));
                         bad_runs.push_back(current_run.get_number());
-                        errorLog << Form("\tRun %d returns |R| > 10%%\n", current_run.get_number());
+                        errorLog << Form("%s,%d,%02d,R attenuation,|R| > 10%\n", ds, current_run.get_number(),b);
                     }
                     R[i] = current_run.get_R()[b];
                     x[i] = current_run.get_number();
