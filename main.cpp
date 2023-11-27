@@ -4,6 +4,7 @@
 #include <vector>
 #include <filesystem>
 #include <fstream>
+#include <typeinfo>
 
 
 #include <limits>
@@ -166,6 +167,7 @@ int main(int argc, char *argv[]) {
 
 
         for (int b = 0; b<bars; b++)   {
+            auto bar_folder = R_folder->mkdir(Form("Bar%02d", b));
             float_t R[n];
             std::vector<float> bad_runs = {};
             std::vector<float> bad_data = {};
@@ -231,14 +233,39 @@ int main(int argc, char *argv[]) {
         mg->SetMinimum(-.11);
         mg->SetMaximum(.11);
         mg->Draw("AP");
-        
-        R_folder->WriteObject(c, Form("Bar%02d", b));
+
+        bar_folder->WriteObject(c, "Zero_Centered");
         c->Clear();
         gr1->Clear();
         gr2->Clear();
-        gr3->Clear();
-        c->Close();
 
+
+        float sum = 0;
+        int count = 0;
+        for (int i = 0; i < n;i++){
+            if (typeid(R[i]) != typeid(nullptr)){
+                sum = sum + R[i];
+                count++;
+            }
+        }
+        float mean = sum/count;
+
+        for (int i=0; i<n; i++){
+            if (typeid(R[i]) != typeid(nullptr)){
+                R[i] = R[i]-mean;
+            }
+        }
+
+        gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
+        mg->Clear();
+        mg->Add(gr1);
+        mg->Add(gr3);
+        mg->Draw("AP");
+
+        bar_folder->WriteObject(c, "Mean_Centered");
+        
+
+        c->Close();
         }
     errorLog.close();
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
