@@ -201,8 +201,9 @@ int main(int argc, char *argv[]) {
             y3[i] = null_data[i];
         }
 
-        auto c = new TCanvas("c", Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
+        auto c = new TCanvas("c", "R Attenuation values");
         auto mg = new TMultiGraph();
+        mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
         auto gr2 = new TGraphErrors(n2, x2, y2, nullptr, nullptr);
         gr2->SetMarkerSize(.5);
         gr2->SetMarkerStyle(21);
@@ -231,7 +232,7 @@ int main(int argc, char *argv[]) {
         gr1->Clear();
         gr2->Clear();
 
-        c = new TCanvas("c", Form("Gain Attenuation R Values Centered %s Bar %d;Run;ΔR", ds, b));
+        c = new TCanvas("c", "Centered at 0");
         float sum = 0;
         int count = 0;
         for (int i = 0; i < n;i++){
@@ -250,6 +251,8 @@ int main(int argc, char *argv[]) {
 
         gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
         mg->Clear();
+        mg = new TMultiGraph();
+        mg->SetTitle(Form("Gain Attenuation R Values Centered %s Bar %d;Run;ΔR", ds, b));
         mg->Add(gr1);
         mg->Add(gr3);
         mg->Draw("AP");
