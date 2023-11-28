@@ -107,21 +107,13 @@ int main(int argc, char *argv[]) {
         gr1->SetLineWidth(1);
         gr1->SetMarkerSize(.5);
         gr1->SetMarkerStyle(21);
-        mg->Add(gr1);
 
         auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
         gr2->SetName("down");
         gr2->SetLineColorAlpha(kBlue, 0.5);
         gr2->SetMarkerSize(.5);
         gr2->SetMarkerStyle(21);
-        mg->Add(gr2);
-        mg->SetTitle(Form("QDC %s Bar %d;Run;Mean QDC", ds, b));
         c1->cd(b+1); mg->Draw("AL");
-
-        auto leg = new TLegend(0.15,0.75,0.3,0.85);
-        leg->AddEntry("up","Up","l");
-        leg->AddEntry("down","Down","l");
-        leg->Draw();
 
         auto updown = means->mkdir(Form("Bar%02d", b),Form("Bar%02d", b));
         updown->WriteObject(gr1, "Up" );
@@ -234,12 +226,12 @@ int main(int argc, char *argv[]) {
         mg->SetMaximum(.11);
         mg->Draw("AP");
 
-        bar_folder->WriteObject(c, "Zero_Centered");
-        c->Clear();
+        bar_folder->WriteObject(c, "Regular");
+        c->Close();
         gr1->Clear();
         gr2->Clear();
 
-
+        c = new TCanvas("c", Form("Gain Attenuation R Values Centered %s Bar %d;Run;ΔR", ds, b));
         float sum = 0;
         int count = 0;
         for (int i = 0; i < n;i++){
@@ -261,6 +253,10 @@ int main(int argc, char *argv[]) {
         mg->Add(gr1);
         mg->Add(gr3);
         mg->Draw("AP");
+
+        auto leg = new TLegend(0.15,0.75,0.3,0.85);
+        leg->AddEntry((TObject*)0, Form("R = %f", mean), "");
+        leg->Draw();
 
         bar_folder->WriteObject(c, "Mean_Centered");
         
