@@ -250,11 +250,16 @@ int main(int argc, char *argv[]) {
         }
 
         gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
+        gr1->SetMarkerSize(.5);
+        gr1->SetMarkerStyle(21);
+
         mg->Clear();
         mg = new TMultiGraph();
         mg->SetTitle(Form("Gain Attenuation R Values Centered %s Bar %d;Run;ΔR", ds, b));
         mg->Add(gr1);
         mg->Add(gr3);
+        mg->SetMinimum(-.11);
+        mg->SetMaximum(.11);
         mg->Draw("AP");
 
         auto leg = new TLegend(0.15,0.75,0.3,0.85);
