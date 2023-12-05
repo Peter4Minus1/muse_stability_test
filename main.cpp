@@ -275,6 +275,7 @@ int main(int argc, char *argv[]) {
         auto leg = new TLegend(0.15,0.75,0.3,0.85);
         leg->AddEntry((TObject*)0, Form("R = %f", mean), "");
         leg->SetTextSize(3);
+        leg->SetTextColor(kBlack);
         leg->Draw();
 
         bar_folder->WriteObject(c, "Mean_Centered");
