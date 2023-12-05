@@ -90,14 +90,17 @@ void QDC::set_data(int run, std::string directory, std::string detector) {
         if (g == nullptr) {
             R = 1.0;
         } else {
-            double r = g->Eval(60.0);
+            double r;
+            if (bars == 18){
+                r = g->Eval(60.0);
+            } else if (bars == 28) {
+                r = g->Eval(110.0);
+            }
             R = exp(r)-1;
         }
 
         R_att.push_back(R);
         
-    //plot nullptrs and above max in different colors
-    //do the fit manually
     }
     
     datafile->Close();

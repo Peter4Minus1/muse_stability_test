@@ -100,6 +100,8 @@ int main(int argc, char *argv[]) {
                 down[i] = current_run.down.get_means()[b];
                 down_err[i] = current_run.down.get_errors()[b];
             }
+
+        //-------------------UP AND DOWN QDC MEANS--------------------//
         auto mg = new TMultiGraph();
         auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
         gr1->SetName("up");
@@ -120,6 +122,8 @@ int main(int argc, char *argv[]) {
         updown->WriteObject(gr2, "Down");
         }
 
+
+        //--------------------------QDC UP/DOWN RATIOS---------------------//
         auto ratios = detector_folder->mkdir("ratios", "QDC Up-Down Ratios");
 
         for (int b = 0; b < bars; b++) {
@@ -138,6 +142,8 @@ int main(int argc, char *argv[]) {
         c1->cd(b+1); gr1->Draw("AL");
 
 
+
+        //---------------------------------GAIN R ATTENUATION-----------------------------//
         float sum=0;
         for (int i = 0; i < runs.size(); i++) {
             sum = sum + up[i];
@@ -158,6 +164,7 @@ int main(int argc, char *argv[]) {
         
 
 
+        //Sort good runs from the bad runs
         for (int b = 0; b<bars; b++)   {
             auto bar_folder = R_folder->mkdir(Form("Bar%02d", b));
             float_t R[n];
@@ -201,6 +208,7 @@ int main(int argc, char *argv[]) {
             y3[i] = null_data[i];
         }
 
+        //-------------------R ATTENUATION------------------------------///
         auto c = new TCanvas("c", "R Attenuation values");
         auto mg = new TMultiGraph();
         mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
@@ -231,6 +239,8 @@ int main(int argc, char *argv[]) {
         c->Close();
         gr1->Clear();
         gr2->Clear();
+
+        //----------------------------------CENTERED R ATTENUATION------------------------------//
 
         c = new TCanvas("c", "Centered at 0");
         float sum = 0;
@@ -264,6 +274,7 @@ int main(int argc, char *argv[]) {
 
         auto leg = new TLegend(0.15,0.75,0.3,0.85);
         leg->AddEntry((TObject*)0, Form("R = %f", mean), "");
+        leg->SetTextSize(3);
         leg->Draw();
 
         bar_folder->WriteObject(c, "Mean_Centered");
