@@ -68,6 +68,8 @@ int main(int argc, char *argv[]) {
     std::cout << "Root file about to create";
     std::unique_ptr<TFile> AllGraphs( TFile::Open("StabilityTest.root", "RECREATE") );
     std::cout << "Root File created";
+    errorLog.open("ErrorLog.csv");
+    errorLog << "Detector,Run,Bar,Data,Error Type\n";
     for (int d = 0; d<4; d++) {
         detector = detectors[d];
         const char* ds = detector.data();
@@ -76,8 +78,7 @@ int main(int argc, char *argv[]) {
 
         auto detector_folder = AllGraphs->mkdir(ds,ds);
         
-        errorLog.open("ErrorLog.csv");
-        errorLog << "Detector,Run,Bar,Data,Error Type\n";
+
 
         const int n = runs.size();
         float_t x[n];
@@ -274,8 +275,6 @@ int main(int argc, char *argv[]) {
 
         auto leg = new TLegend(0.15,0.75,0.3,0.85);
         leg->AddEntry((TObject*)0, Form("R = %f", mean), "");
-        leg->SetTextSize(3);
-        leg->SetTextColor(kBlack);
         leg->Draw();
 
         bar_folder->WriteObject(c, "Mean_Centered");
@@ -283,11 +282,12 @@ int main(int argc, char *argv[]) {
 
         c->Close();
         }
-    errorLog.close();
+    
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
     c1->Clear();
     }
 c1->Close();
+errorLog.close();
 
 //std::unique_ptr<TFile> myFile( TFile::Open("file.root", "RECREATE") );
 
