@@ -13,13 +13,17 @@
 #include <TProfile.h>
 #include "dataclasses.h"
 
-void Data::set_means(std::vector<float> a) {means = a;}
-void Data::set_errors(std::vector<float> a) {errors = a;}
-//void Data::set_maxbins(std::vector<float> a) {maxbins = a;}
-std::vector<float> Data::get_means() {return means;}
-std::vector<float> Data::get_errors() {return errors;}
-//std::vector<float> Data::get_maxbins() {return maxbins;}
-int Data::size() {return means.size();}
+//------------------HIST-------------------------//
+
+void Hist::set_means(std::vector<float> a) {means = a;}
+void Hist::set_errors(std::vector<float> a) {errors = a;}
+
+std::vector<float> Hist::get_means() {return means;}
+std::vector<float> Hist::get_errors() {return errors;}
+
+int Hist::size() {return means.size();}
+
+//------------------UPDOWN-------------------------//
 
 void UpDown::set_ratios() {
     ratios = {};
@@ -29,8 +33,10 @@ void UpDown::set_products() {
     products = {};
     for (int i=0; i<up.size(); i++) {products.push_back(up.get_means()[i]*down.get_means()[i]);}
     }
+
 std::vector<float> UpDown::get_ratios() {return ratios;}
 std::vector<float> UpDown::get_products() {return products;}
+
 std::vector<float> UpDown::std_err(char type) {
 	std::vector<float> sd = {};
 	std::vector<float> a = up.get_means();
@@ -49,79 +55,109 @@ std::vector<float> UpDown::std_err(char type) {
 	return sd;
 }
 
-std::vector<float> Gain::get_R() {return R_values;}
-void Gain::set_R(std::vector<float> a) {R_values = a;}
+//------------------PROFILE-------------------------//
 
+std::vector<float> Profile::get_R() {return R_values;}
+void Profile::set_R(std::vector<float> a) {R_values = a;}
 
-void QDC::set_data(int run, std::string directory, std::string detector) {
-    std::string file_name = directory + Form("/run%d.root", run);
+//------------------DETECTOR-------------------------//
+
+Detector::Detector(std::string name, bool front) {
+    this->name = name;
+    this->front = front;
+}
+
+Detector::isFront(){return front;}
+Detector::get_name(){return name;}
+
+//------------------RUN-------------------------//
+
+Run::Run(int run_num) {
+    this->run_num = run_num;
+    SPSLF = new Detector("SPSLF", true);
+    SPSRF = new Detector("SPSRF", true);
+    SPSLR = new Detector("SPSLR", false);
+    SPSRR = new Detector("SPSRR", false);
+    SPS = {SPSLF, SPSRF, SPSLR, SPSRR};
+
+}
+
+void Run::set_data(std::string directory) {
+    std::string file_name = directory + Form("/run%d.root", run_num);
     TFile* datafile = new TFile(file_name.c_str(), "READ");
-    
-    std::vector<float> u = {};
-    std::vector<float> d = {};
-    std::vector<float> u_err = {};
-    std::vector<float> d_err = {};
-    std::vector<float> R_att = {};
-    //std::vector<float> u_maxbin = {};
-    //std::vector<float> d_maxbin = {};
-	    
-    double x = 0;
-    int bars;
-    const char * sps = detector.data();
-    if (detector == "SPSLF" | detector == "SPSRF") {bars = 18;}
-    else {bars = 28;} 
-    for (int b = 0; b < bars; b++) {
-    	TH1F* hist_up = (TH1F*)datafile->Get(Form("/%s/Bar%02d/QDC/qdc_trig_%s%02dup",sps, b, sps, b));
-    	TH1F* hist_down = (TH1F*)datafile->Get(Form("/%s/Bar%02d/QDC/qdc_trig_%s%02ddown", sps, b, sps, b));
-    	 	
-    	u.push_back(hist_up->GetMean());
-    	d.push_back(hist_down->GetMean());
-    		
-    	u_err.push_back(hist_up->GetMean(11));
-    	d_err.push_back(hist_down->GetMean(11));
-    	    	
-    	//u_maxbin.push_back(hist_up->GetMaximumBin())
-    	//d_maxbin.push_back(hist_down->GetMaximumBin()) 
 
-        
-        TProfile* attenuation_graph = (TProfile*)datafile->Get(Form("/%s/Bar%02d/Gain/profile_ratio_%s%02d", sps, b, sps, b));
-        TF1* g = (TF1*)attenuation_graph->GetListOfFunctions()->FindObject("pol1");
-        double R;
-        if (g == nullptr) {
-            R = 1.0;
+    for(int d = 0; d < SPS.size(); d++) {
+
+        Detector detector = SPS[d];
+
+        std::vector<float> u = {};
+        std::vector<float> d = {};
+        std::vector<float> u_err = {};
+        std::vector<float> d_err = {};
+        std::vector<float> R_att = {};
+
+        int length;
+        const char* name_ptr = detector.get_name().data();
+
+        if (detector.isFront()) {
+            length = 18;
         } else {
-            double r;
-            if (bars == 18){
-                r = g->Eval(60.0);
-            } else if (bars == 28) {
-                r = g->Eval(110.0);
-            }
-            R = exp(r)-1;
+            length = 28;
+        } 
+
+        //QDC
+
+        for (int bar = 0; bar < length; bar++) {
+            TH1F* hist_up = (TH1F*)datafile->Get(Form("/%s/Bar%02d/QDC/qdc_trig_%s%02dup", name_ptr, bar, name_ptr, bar));
+            TH1F* hist_down = (TH1F*)datafile->Get(Form("/%s/Bar%02d/QDC/qdc_trig_%s%02ddown", name_ptr, bar, name_ptr, bar));
+                
+            u.push_back(hist_up->GetMean());
+            d.push_back(hist_down->GetMean());
+                
+            u_err.push_back(hist_up->GetMean(11));
+            d_err.push_back(hist_down->GetMean(11));
         }
 
-        R_att.push_back(R);
-        
+        detector.qdc.trig.up.set_means(u);
+        detector.qdc.trig.down.set_means(d);
+        detector.qdc.trig.up.set_errors(u_err);
+        detector.qdc.trig.down.set_errors(d_err);
+
+        detector.qdc.trig.set_ratios();
+        detector.qdc.trig.set_products();
+
+        //Gain
+
+        for (int bar = 0; bar < length; bar++) {
+            TProfile* attenuation_graph = (TProfile*)datafile->Get(Form("/%s/Bar%02d/Gain/profile_ratio_%s%02d", name_ptr, bar, name_ptr, bar));
+            TF1* g = (TF1*)attenuation_graph->GetListOfFunctions()->FindObject("pol1");
+            double R;
+            if (g == nullptr) {
+                R = 1.0;
+            } else {
+                double r;
+                if (detector.isFront()){
+                    r = g->Eval(60.0);
+                } else {
+                    r = g->Eval(110.0);
+                }
+                R = exp(r)-1;
+            }
+            
+            R_att.push_back(R);
+        }
+
+        detector.gain.profile_ratio.set_R(R_att);
     }
-    
+   
     datafile->Close();
     delete datafile;
-    	
-    up.set_means(u);
-    down.set_means(d);
-    up.set_errors(u_err);
-    down.set_errors(d_err);
-    set_R(R_att);
 }
 
-
-
-Run::Run(int num) {
-    set_run(num);
-}
 void Run::set_run(int n) {run_num = n;}
 int Run::get_number() {return run_num;}
 
-
+//-------------------MISC----------------------//
 
 void convert(std::vector<float> a, float_t *b, int n)
 {

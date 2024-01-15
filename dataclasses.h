@@ -12,7 +12,7 @@
 #include <TMultiGraph.h>
 #include <TProfile.h>
 
-class Data {
+class Hist {
 
 private:
     std::vector<float> means;
@@ -37,8 +37,8 @@ private:
     std::vector<float> products;
     
 public:
-    Data up;
-    Data down;
+    Hist up;
+    Hist down;
     void set_ratios();
     void set_products();
     
@@ -48,7 +48,7 @@ public:
     std::vector<float> std_err(char type);    
 };
 
-class Gain {
+class Profile {
 private:
     std::vector<float> R_values;
 public:
@@ -56,20 +56,44 @@ public:
     void set_R(std::vector<float> a);
 };
 
-class QDC : public UpDown, public Gain{
-public:
-    void set_data(int run, std::string directory, std::string detector);
+
+class QDC {
+    //UpDown raw;
+    UpDown trig;
+    //UpDown QDC_ped;
 };
 
+class Gain {
+    Profile profile_ratio;
+};
 
+class Detector{
+    private:
+        std::string name;
+        bool front;
+    public:
+        Gain gain;
+        QDC qdc;
 
-class Run : public QDC {
+        Detector(std::string name, bool front);
+        bool isFront();
+        std::string get_name();
+};
+
+class Run {
 private:
     int run_num;
+    Detector SPSLF;
+    Detector SPSRF;
+    Detector SPSLR;
+    Detector SPSRR;
 public:
+    std::vector<Detector> SPS;
+
     Run(int num);
     void set_run(int n);
     int get_number();
+    void set_data(std::string directory);
 };
 
 void convert(std::vector<float> v, float_t* a, int n);

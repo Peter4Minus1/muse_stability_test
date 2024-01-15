@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
     }
 
 
-    std::vector<Run> runs = {};//{14495,14497,14513,14516,14520,14530,14535,14539,14547,14550,14555,14560,14564,14565,14566};
+    std::vector<Run> runs = {};
 
     for (int r = minrun; r <= maxrun; r++) {
         //std::cout << r;
@@ -54,129 +54,135 @@ int main(int argc, char *argv[]) {
         f.Close();
     }
     
-    std::vector<std::string> detectors = {"SPSLF", "SPSRF", "SPSLR", "SPSRR"};
-    std::string detector;
-    int bars;
+    for (int i = 0; i < runs.size(); i++){
+        runs[i].set_data();
+    }
     const int n = runs.size();
 
     //QDC means graph
-    Run current_run = runs[0];
-    auto c1 = new TCanvas("c1", "QDC Mean Values", 1200, 2400);
 
     std::ofstream errorLog;
 
-    std::cout << "Root file about to create";
+    std::cout << "\nRoot file about to create\n";
     std::unique_ptr<TFile> AllGraphs( TFile::Open("StabilityTest.root", "RECREATE") );
     std::cout << "Root File created";
     errorLog.open("ErrorLog.csv");
     errorLog << "Detector,Run,Bar,Data,Error Type\n";
+ 
+    Run this_run = runs[0];
+
+
     for (int d = 0; d<4; d++) {
-        detector = detectors[d];
-        const char* ds = detector.data();
-        if (detector == "SPSLF" | detector == "SPSRF") {bars = 18; c1->Divide(3,6);}
-        else {bars = 28;c1->Divide(4,7);} 
 
+        const char* ds = this_run.SPS[d].get_name().data();
         auto detector_folder = AllGraphs->mkdir(ds,ds);
-        
-
 
         const int n = runs.size();
-        float_t x[n];
-        float_t up[n];
-        float_t up_err[n];
-        float_t down[n];
-        float_t down_err[n];
 
         std::vector<float> errs = {};
-        
-        auto means = detector_folder->mkdir("means", "QDC Historgram Means");
 
-        for (int b = 0; b < bars; b++) {
-            for (int i = 0; i < runs.size(); i++) {
-                current_run = Run(runs[i]);
-                current_run.QDC::set_data(runs[i].get_number(), directory, detector);
-                x[i] = runs[i].get_number();
-                up[i] = current_run.up.get_means()[b];
-                up_err[i] = current_run.up.get_errors()[b];
-                down[i] = current_run.down.get_means()[b];
-                down_err[i] = current_run.down.get_errors()[b];
-            }
+        UpDown this_qdc = this_run.SPS[d].qdc;
 
-        //-------------------UP AND DOWN QDC MEANS--------------------//
-        auto mg = new TMultiGraph();
-        auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
-        gr1->SetName("up");
-        gr1->SetLineColor(kRed);
-        gr1->SetLineWidth(1);
-        gr1->SetMarkerSize(.5);
-        gr1->SetMarkerStyle(21);
-
-        auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
-        gr2->SetName("down");
-        gr2->SetLineColorAlpha(kBlue, 0.5);
-        gr2->SetMarkerSize(.5);
-        gr2->SetMarkerStyle(21);
-        c1->cd(b+1); mg->Draw("AL");
-
-        auto updown = means->mkdir(Form("Bar%02d", b),Form("Bar%02d", b));
-        updown->WriteObject(gr1, "Up" );
-        updown->WriteObject(gr2, "Down");
+        int bars;
+        if this_run.SPS[d].isFront(){
+            bars = 18;
+        } else {
+            bars = 28
         }
 
-
-        //--------------------------QDC UP/DOWN RATIOS---------------------//
-        auto ratios = detector_folder->mkdir("ratios", "QDC Up-Down Ratios");
-
         for (int b = 0; b < bars; b++) {
+
+            float_t x[n];
+
+            float_t up[n];
+            float_t up_err[n];
+
+            float_t down[n];
+            float_t down_err[n];
+
+            const char* bar_str = Form("Bar%02d", b).data();
+            auto bar_folder = detector_folder->mkdir(bar_str, bar_str);
+
             for (int i = 0; i < runs.size(); i++) {
-                current_run = runs[i];
-                current_run.QDC::set_data(runs[i].get_number(), directory, detector);
-                current_run.QDC::set_ratios();
-                x[i] = runs[i].get_number();
-                up[i] = current_run.QDC::get_ratios()[b];
-                up_err[i] = current_run.QDC::std_err('r')[b];
+                this_run = Run(runs[i]);
+
+                x[i] = this_run.get_number();
+
+                up[i] = this_qdc.trig.up.get_means()[b];
+                up_err[i] = this_qdc.trig.up.get_errors()[b];
+
+                down[i] = this_qdc.trig.down.get_means()[b];
+                down_err[i] = this_qdc.trig.down.get_errors()[b];
+
+                
             }
-        auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
-        gr1->SetMarkerSize(.5);
-        gr1->SetMarkerStyle(21); 
-        gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %d;Run;QDC Ratio", ds, b));
-        c1->cd(b+1); gr1->Draw("AL");
 
+            //-------------------UP AND DOWN QDC MEANS--------------------//
+            
+            auto mg = new TMultiGraph();
+            auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
+            gr1->SetName("up");
+            gr1->SetLineColor(kRed);
+            gr1->SetLineWidth(1);
+            gr1->SetMarkerSize(.5);
+            gr1->SetMarkerStyle(21);
 
+            auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
+            gr2->SetName("down");
+            gr2->SetLineColorAlpha(kBlue, 0.5);
+            gr2->SetMarkerSize(.5);
+            gr2->SetMarkerStyle(21);
+
+            auto qdc_folder = bar_folder->mkdir("QDC", "QDC");
+            qdc_folder->WriteObject(gr1, "Up" );
+            qdc_folder->WriteObject(gr2, "Down");
+        
+        //--------------------------QDC UP/DOWN RATIOS---------------------//
+
+            float_t ratios[n];
+            float_t ratio_err[n];
+
+            for (int i = 0; i < runs.size(); i++) {
+                this_run = runs[i];
+                x[i] = this_run.get_number();
+                ratios[i] = this_qdc.trig.get_ratios()[b];
+                ratio_err[i] = this_qdc.trig.std_err('r')[b];
+            }
+            auto gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
+            gr1->SetMarkerSize(.5);
+            gr1->SetMarkerStyle(21); 
+            gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %d;Run;QDC Ratio", ds, b));
+
+            qdc_folder->WriteObject(gr1, Form("ratios", b));
 
         //---------------------------------GAIN R ATTENUATION-----------------------------//
-        float sum=0;
-        for (int i = 0; i < runs.size(); i++) {
-            sum = sum + up[i];
-        }
-        float mean = sum/bars;
-        float Sr = 0;
-        for (int i = 0; i < runs.size(); i++) {
-            Sr = Sr + pow(mean-up[i], 2);
-        }
-        float stddev = pow(Sr/bars, 0.5);
-        float err = stddev/pow(bars, 0.5);
-        errs.push_back(err);
-        
-        ratios->WriteObject(gr1, Form("Bar%02d", b));
-        }
 
-        auto R_folder = detector_folder->mkdir("R values", "Gain Attenuation R values");
-        
+            auto gain_folder = bar_folder->mkdir("Gain", "Gain");
+
+            float sum=0;
+            for (int i = 0; i < runs.size(); i++) {
+                sum = sum + up[i];
+            }
+            float mean = sum/bars;
+            float Sr = 0;
+            for (int i = 0; i < runs.size(); i++) {
+                Sr = Sr + pow(mean-up[i], 2);
+            }
+            float stddev = pow(Sr/bars, 0.5);
+            float err = stddev/pow(bars, 0.5);
+            errs.push_back(err);            
 
 
         //Sort good runs from the bad runs
-        for (int b = 0; b<bars; b++)   {
-            auto bar_folder = R_folder->mkdir(Form("Bar%02d", b));
+            float_t x[n];
             float_t R[n];
             std::vector<float> bad_runs = {};
             std::vector<float> bad_data = {};
             std::vector<float> null_data = {};
             std::vector<float> null_runs = {};
             for (int i = 0; i < runs.size(); i++){
-                current_run = runs[i];
-                current_run.QDC::set_data(runs[i].get_number(), directory, detector);
-                float Rx = current_run.get_R()[b];
+                this_run = runs[i];
+                float Rx = this_run.get_R()[b];
                 if (Rx == 1.0){
                     null_data.push_back(0.0);
                     null_runs.push_back(current_run.get_number());
@@ -192,95 +198,95 @@ int main(int argc, char *argv[]) {
                     x[i] = current_run.get_number();
                 }
             }
-        const int n2 = bad_data.size();
-        float_t x2[n2];
-        float_t y2[n2];
-        const int n3 = null_data.size();
-        float_t x3[n3];
-        float_t y3[n3];
+            const int n2 = bad_data.size();
+            float_t x2[n2];
+            float_t y2[n2];
+            const int n3 = null_data.size();
+            float_t x3[n3];
+            float_t y3[n3];
 
-        for (int i = 0; i < n2; i++) {
-            x2[i] = bad_runs[i];
+            for (int i = 0; i < n2; i++) {
+                x2[i] = bad_runs[i];
 
-            y2[i] = bad_data[i];
-        }
-        for (int i = 0; i < n3; i++){
-            x3[i] = null_runs[i];
-            y3[i] = null_data[i];
-        }
-
-        //-------------------R ATTENUATION------------------------------///
-        auto c = new TCanvas("c", "R Attenuation values");
-        auto mg = new TMultiGraph();
-        mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
-        auto gr2 = new TGraphErrors(n2, x2, y2, nullptr, nullptr);
-        gr2->SetMarkerSize(.5);
-        gr2->SetMarkerStyle(21);
-        gr2->SetMarkerColor(kBlue);
-        mg->Add(gr2);
-
-        
-        auto gr3 = new TGraphErrors(n3, x3, y3, nullptr, nullptr);
-        gr3->SetMarkerSize(.5);
-        gr3->SetMarkerStyle(21);
-        gr3->SetMarkerColor(kRed);
-        mg->Add(gr3);
-        
-
-        auto gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
-        gr1->SetMarkerSize(.5);
-        gr1->SetMarkerStyle(21); 
-        gr1->SetTitle(Form("QDC Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
-        mg->Add(gr1);
-        mg->SetMinimum(-.11);
-        mg->SetMaximum(.11);
-        mg->Draw("AP");
-
-        bar_folder->WriteObject(c, "Regular");
-        c->Close();
-        gr1->Clear();
-        gr2->Clear();
-
-        //----------------------------------CENTERED R ATTENUATION------------------------------//
-
-        c = new TCanvas("c", "Centered at 0");
-        float sum = 0;
-        int count = 0;
-        for (int i = 0; i < n;i++){
-            if (typeid(R[i]) != typeid(nullptr)){
-                sum = sum + R[i];
-                count++;
+                y2[i] = bad_data[i];
             }
-        }
-        float mean = sum/count;
-
-        for (int i=0; i<n; i++){
-            if (typeid(R[i]) != typeid(nullptr)){
-                R[i] = R[i]-mean;
+            for (int i = 0; i < n3; i++){
+                x3[i] = null_runs[i];
+                y3[i] = null_data[i];
             }
-        }
 
-        gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
-        gr1->SetMarkerSize(.5);
-        gr1->SetMarkerStyle(21);
+            //-------------------R ATTENUATION------------------------------///
+            auto c = new TCanvas("c", "R Attenuation values");
+            auto mg = new TMultiGraph();
+            mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
+            auto gr2 = new TGraphErrors(n2, x2, y2, nullptr, nullptr);
+            gr2->SetMarkerSize(.5);
+            gr2->SetMarkerStyle(21);
+            gr2->SetMarkerColor(kBlue);
+            mg->Add(gr2);
 
-        mg->Clear();
-        mg = new TMultiGraph();
-        mg->SetTitle(Form("Gain Attenuation R Values Centered %s Bar %d;Run;ΔR", ds, b));
-        mg->Add(gr1);
-        mg->Add(gr3);
-        mg->SetMinimum(-.11);
-        mg->SetMaximum(.11);
-        mg->Draw("AP");
+            
+            auto gr3 = new TGraphErrors(n3, x3, y3, nullptr, nullptr);
+            gr3->SetMarkerSize(.5);
+            gr3->SetMarkerStyle(21);
+            gr3->SetMarkerColor(kRed);
+            mg->Add(gr3);
+            
 
-        auto leg = new TLegend(0.15,0.75,0.3,0.85);
-        leg->AddEntry((TObject*)0, Form("R = %f", mean), "");
-        leg->Draw();
+            auto gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
+            gr1->SetMarkerSize(.5);
+            gr1->SetMarkerStyle(21); 
+            gr1->SetTitle(Form("QDC Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
+            mg->Add(gr1);
+            mg->SetMinimum(-.11);
+            mg->SetMaximum(.11);
+            mg->Draw("AP");
 
-        bar_folder->WriteObject(c, "Mean_Centered");
-        
+            gain_folder->WriteObject(c, "Regular");
+            c->Close();
+            gr1->Clear();
+            gr2->Clear();
 
-        c->Close();
+            //----------------------------------CENTERED R ATTENUATION------------------------------//
+
+            c = new TCanvas("c", "Centered at 0");
+            float sum = 0;
+            int count = 0;
+            for (int i = 0; i < n;i++){
+                if (typeid(R[i]) != typeid(nullptr)){
+                    sum = sum + R[i];
+                    count++;
+                }
+            }
+            float mean = sum/count;
+
+            for (int i=0; i<n; i++){
+                if (typeid(R[i]) != typeid(nullptr)){
+                    R[i] = R[i]-mean;
+                }
+            }
+
+            gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
+            gr1->SetMarkerSize(.5);
+            gr1->SetMarkerStyle(21);
+
+            mg->Clear();
+            mg = new TMultiGraph();
+            mg->SetTitle(Form("Gain Attenuation R Values Centered %s Bar %d;Run;ΔR", ds, b));
+            mg->Add(gr1);
+            mg->Add(gr3);
+            mg->SetMinimum(-.11);
+            mg->SetMaximum(.11);
+            mg->Draw("AP");
+
+            auto leg = new TLegend(0.15,0.75,0.3,0.85);
+            leg->AddEntry((TObject*)0, Form("R = %f", mean), "");
+            leg->Draw();
+
+            gain_folder->WriteObject(c, "Mean_Centered");
+            
+
+            c->Close();
         }
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
