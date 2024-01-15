@@ -108,12 +108,19 @@ int main(int argc, char *argv[]) {
                 this_run = Run(runs[i]);
 
                 x[i] = this_run.get_number();
+                std::cout << x[i];
 
                 up[i] = this_qdc.trig.up.get_means()[b];
                 up_err[i] = this_qdc.trig.up.get_errors()[b];
 
+                std::cout << up[i];
+                std::cout << up_err[i];
+
                 down[i] = this_qdc.trig.down.get_means()[b];
                 down_err[i] = this_qdc.trig.down.get_errors()[b];
+
+                std::cout << down[i];
+                std::cout << down_err[i];
 
                 
             }
