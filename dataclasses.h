@@ -58,13 +58,15 @@ public:
 
 
 class QDC {
-    //UpDown raw;
-    UpDown trig;
-    //UpDown QDC_ped;
+    public:
+        //UpDown raw;
+        UpDown trig;
+        //UpDown QDC_ped;
 };
 
 class Gain {
-    Profile profile_ratio;
+    public:
+        Profile profile_ratio;
 };
 
 class Detector{
@@ -72,10 +74,11 @@ class Detector{
         std::string name;
         bool front;
     public:
+        Detector();
+        Detector(std::string name, bool front);
+
         Gain gain;
         QDC qdc;
-
-        Detector(std::string name, bool front);
         bool isFront();
         std::string get_name();
 };
@@ -87,10 +90,10 @@ private:
     Detector SPSRF;
     Detector SPSLR;
     Detector SPSRR;
-public:
-    std::vector<Detector> SPS;
 
+public:
     Run(int num);
+    std::vector<Detector> SPS;
     void set_run(int n);
     int get_number();
     void set_data(std::string directory);

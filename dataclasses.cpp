@@ -62,22 +62,27 @@ void Profile::set_R(std::vector<float> a) {R_values = a;}
 
 //------------------DETECTOR-------------------------//
 
-Detector::Detector(std::string name, bool front) {
-    this->name = name;
-    this->front = front;
+Detector::Detector(){
+    name = "SPSLF";
+    front = true;
 }
 
-Detector::isFront(){return front;}
-Detector::get_name(){return name;}
+Detector::Detector(std::string _name, bool _front) {
+    name = _name;
+    front = _front;
+}
+
+bool Detector::isFront(){return front;}
+std::string Detector::get_name(){return name;}
 
 //------------------RUN-------------------------//
 
-Run::Run(int run_num) {
-    this->run_num = run_num;
-    SPSLF = new Detector("SPSLF", true);
-    SPSRF = new Detector("SPSRF", true);
-    SPSLR = new Detector("SPSLR", false);
-    SPSRR = new Detector("SPSRR", false);
+Run::Run(int num) {
+    run_num = num;
+    SPSLF = Detector("SPSLF", true);
+    SPSRF = Detector("SPSRF", true);
+    SPSLR = Detector("SPSLR", false);
+    SPSRR = Detector("SPSRR", false);
     SPS = {SPSLF, SPSRF, SPSLR, SPSRR};
 
 }
@@ -90,8 +95,8 @@ void Run::set_data(std::string directory) {
 
         Detector detector = SPS[d];
 
-        std::vector<float> u = {};
-        std::vector<float> d = {};
+        std::vector<float> up = {};
+        std::vector<float> down = {};
         std::vector<float> u_err = {};
         std::vector<float> d_err = {};
         std::vector<float> R_att = {};
@@ -111,15 +116,15 @@ void Run::set_data(std::string directory) {
             TH1F* hist_up = (TH1F*)datafile->Get(Form("/%s/Bar%02d/QDC/qdc_trig_%s%02dup", name_ptr, bar, name_ptr, bar));
             TH1F* hist_down = (TH1F*)datafile->Get(Form("/%s/Bar%02d/QDC/qdc_trig_%s%02ddown", name_ptr, bar, name_ptr, bar));
                 
-            u.push_back(hist_up->GetMean());
-            d.push_back(hist_down->GetMean());
+            up.push_back(hist_up->GetMean());
+            down.push_back(hist_down->GetMean());
                 
             u_err.push_back(hist_up->GetMean(11));
             d_err.push_back(hist_down->GetMean(11));
         }
 
-        detector.qdc.trig.up.set_means(u);
-        detector.qdc.trig.down.set_means(d);
+        detector.qdc.trig.up.set_means(up);
+        detector.qdc.trig.down.set_means(down);
         detector.qdc.trig.up.set_errors(u_err);
         detector.qdc.trig.down.set_errors(d_err);
 

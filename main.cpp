@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     }
     
     for (int i = 0; i < runs.size(); i++){
-        runs[i].set_data();
+        runs[i].set_data(directory);
     }
     const int n = runs.size();
 
@@ -81,13 +81,14 @@ int main(int argc, char *argv[]) {
 
         std::vector<float> errs = {};
 
-        UpDown this_qdc = this_run.SPS[d].qdc;
+        QDC this_qdc = this_run.SPS[d].qdc;
+        Gain this_gain = this_run.SPS[d].gain;
 
         int bars;
-        if this_run.SPS[d].isFront(){
+        if (this_run.SPS[d].isFront()){
             bars = 18;
         } else {
-            bars = 28
+            bars = 28;
         }
 
         for (int b = 0; b < bars; b++) {
@@ -100,7 +101,7 @@ int main(int argc, char *argv[]) {
             float_t down[n];
             float_t down_err[n];
 
-            const char* bar_str = Form("Bar%02d", b).data();
+            const char* bar_str = Form("Bar%02d", b);
             auto bar_folder = detector_folder->mkdir(bar_str, bar_str);
 
             for (int i = 0; i < runs.size(); i++) {
@@ -148,12 +149,12 @@ int main(int argc, char *argv[]) {
                 ratios[i] = this_qdc.trig.get_ratios()[b];
                 ratio_err[i] = this_qdc.trig.std_err('r')[b];
             }
-            auto gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
+            gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %d;Run;QDC Ratio", ds, b));
 
-            qdc_folder->WriteObject(gr1, Form("ratios", b));
+            qdc_folder->WriteObject(gr1, "ratios");
 
         //---------------------------------GAIN R ATTENUATION-----------------------------//
 
@@ -174,7 +175,7 @@ int main(int argc, char *argv[]) {
 
 
         //Sort good runs from the bad runs
-            float_t x[n];
+            float_t x_valid[n];
             float_t R[n];
             std::vector<float> bad_runs = {};
             std::vector<float> bad_data = {};
@@ -182,20 +183,20 @@ int main(int argc, char *argv[]) {
             std::vector<float> null_runs = {};
             for (int i = 0; i < runs.size(); i++){
                 this_run = runs[i];
-                float Rx = this_run.get_R()[b];
+                float Rx = this_gain.profile_ratio.get_R()[b];
                 if (Rx == 1.0){
                     null_data.push_back(0.0);
-                    null_runs.push_back(current_run.get_number());
-                    errorLog << Form("%s,%d,%02d,R attenuation,returns NULL\n", ds, current_run.get_number(),b);
+                    null_runs.push_back(this_run.get_number());
+                    errorLog << Form("%s,%d,%02d,R attenuation,returns NULL\n", ds, this_run.get_number(),b);
                 } else {
                     
                     if (abs(Rx) > .1){
                         bad_data.push_back(0.1 * Rx/abs(Rx));
-                        bad_runs.push_back(current_run.get_number());
-                        errorLog << Form("%s,%d,%02d,R attenuation,|R| > 10%%\n", ds, current_run.get_number(),b);
+                        bad_runs.push_back(this_run.get_number());
+                        errorLog << Form("%s,%d,%02d,R attenuation,|R| > 10%%\n", ds, this_run.get_number(),b);
                     }
-                    R[i] = current_run.get_R()[b];
-                    x[i] = current_run.get_number();
+                    R[i] = this_gain.profile_ratio.get_R()[b];
+                    x_valid[i] = this_run.get_number();
                 }
             }
             const int n2 = bad_data.size();
@@ -207,7 +208,6 @@ int main(int argc, char *argv[]) {
 
             for (int i = 0; i < n2; i++) {
                 x2[i] = bad_runs[i];
-
                 y2[i] = bad_data[i];
             }
             for (int i = 0; i < n3; i++){
@@ -217,9 +217,10 @@ int main(int argc, char *argv[]) {
 
             //-------------------R ATTENUATION------------------------------///
             auto c = new TCanvas("c", "R Attenuation values");
-            auto mg = new TMultiGraph();
+            mg = new TMultiGraph();
             mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
-            auto gr2 = new TGraphErrors(n2, x2, y2, nullptr, nullptr);
+
+            gr2 = new TGraphErrors(n2, x2, y2, nullptr, nullptr);
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
             gr2->SetMarkerColor(kBlue);
@@ -233,7 +234,7 @@ int main(int argc, char *argv[]) {
             mg->Add(gr3);
             
 
-            auto gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
+            gr1 = new TGraphErrors(n, x_valid, R, nullptr, nullptr);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("QDC Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
@@ -250,7 +251,7 @@ int main(int argc, char *argv[]) {
             //----------------------------------CENTERED R ATTENUATION------------------------------//
 
             c = new TCanvas("c", "Centered at 0");
-            float sum = 0;
+            sum = 0;
             int count = 0;
             for (int i = 0; i < n;i++){
                 if (typeid(R[i]) != typeid(nullptr)){
@@ -258,7 +259,7 @@ int main(int argc, char *argv[]) {
                     count++;
                 }
             }
-            float mean = sum/count;
+            mean = sum/count;
 
             for (int i=0; i<n; i++){
                 if (typeid(R[i]) != typeid(nullptr)){
@@ -290,9 +291,7 @@ int main(int argc, char *argv[]) {
         }
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
-    c1->Clear();
     }
-c1->Close();
 errorLog.close();
 
 //std::unique_ptr<TFile> myFile( TFile::Open("file.root", "RECREATE") );
