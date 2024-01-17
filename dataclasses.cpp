@@ -105,6 +105,9 @@ Detector::Detector(){
 Detector::Detector(std::string _name, bool _front) {
     name = _name;
     front = _front;
+
+    qdc = QDC();
+    gain = Gain();
 }
 
 bool Detector::isFront(){return front;}
