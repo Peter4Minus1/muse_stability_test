@@ -20,6 +20,8 @@ private:
     //std::vector<float> maxbins;
     
 public:
+    Hist();
+
     void set_means(std::vector<float> a);
     void set_errors(std::vector<float> a);
     //void set_maxbins(std::vector<float> a);
@@ -35,10 +37,15 @@ class UpDown {
 private:
     std::vector<float> ratios;
     std::vector<float> products;
-    
-public:
+
     Hist up;
     Hist down;
+    
+public:
+    UpDown();
+
+    Hist _up();
+    Hist _down();
     void set_ratios();
     void set_products();
     
@@ -52,33 +59,46 @@ class Profile {
 private:
     std::vector<float> R_values;
 public:
+    Profile();
     std::vector<float> get_R();
     void set_R(std::vector<float> a);
 };
 
 
 class QDC {
-    public:
+    private:
         //UpDown raw;
         UpDown trig;
         //UpDown QDC_ped;
+    public:
+        QDC();
+        
+        UpDown _trig();
 };
 
 class Gain {
-    public:
+    private:
         Profile profile_ratio;
+    public:
+        Gain();
+        Profile _profile_ratio();
 };
 
 class Detector{
     private:
         std::string name;
         bool front;
+
+        Gain gain;
+        QDC qdc;
     public:
         Detector();
         Detector(std::string name, bool front);
 
-        Gain gain;
-        QDC qdc;
+
+        Gain getGain();
+        QDC getQdc();
+        
         bool isFront();
         std::string get_name();
 };
@@ -86,14 +106,10 @@ class Detector{
 class Run {
 private:
     int run_num;
-    Detector SPSLF;
-    Detector SPSRF;
-    Detector SPSLR;
-    Detector SPSRR;
 
 public:
     Run(int num);
-    std::vector<Detector> SPS;
+    Detector* SPS[4];
     void set_run(int n);
     int get_number();
     void set_data(std::string directory);

@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
     
     for (int i = 0; i < runs.size(); i++){
         runs[i].set_data(directory);
+        std::cout << runs[i].SPS[0]->getQdc()._trig()._down().get_means()[0];
     }
     const int n = runs.size();
 
@@ -74,18 +75,18 @@ int main(int argc, char *argv[]) {
 
     for (int d = 0; d<4; d++) {
 
-        const char* ds = this_run.SPS[d].get_name().data();
+        const char* ds = this_run.SPS[d]->get_name().data();
         auto detector_folder = AllGraphs->mkdir(ds,ds);
 
         const int n = runs.size();
 
         std::vector<float> errs = {};
 
-        QDC this_qdc = this_run.SPS[d].qdc;
-        Gain this_gain = this_run.SPS[d].gain;
+        //QDC this_qdc = this_run.SPS[d].qdc;
+        //Gain this_gain = this_run.SPS[d].gain;
 
         int bars;
-        if (this_run.SPS[d].isFront()){
+        if (this_run.SPS[d]->isFront()){
             bars = 18;
         } else {
             bars = 28;
@@ -110,20 +111,21 @@ int main(int argc, char *argv[]) {
                 x[i] = this_run.get_number();
                 std::cout << x[i];
 
-                up[i] = this_run.SPS[d].qdc.trig.up.get_means()[b];
-                up_err[i] = this_run.SPS[d].qdc.trig.up.get_errors()[b];
+                up[i] = this_run.SPS[d]->getQdc()._trig()._up().get_means()[b];
+                up_err[i] = this_run.SPS[d]->getQdc()._trig()._up().get_errors()[b];
 
                 std::cout << up[i];
                 std::cout << up_err[i];
 
-                down[i] = this_run.SPS[d].qdc.trig.down.get_means()[b];
-                down_err[i] = this_run.SPS[d].qdc.trig.down.get_errors()[b];
+                down[i] = this_run.SPS[d]->getQdc()._trig()._down().get_means()[b];
+                down_err[i] = this_run.SPS[d]->getQdc()._trig()._down().get_errors()[b];
 
                 std::cout << down[i];
                 std::cout << down_err[i];
 
                 
             }
+            /*
 
             //-------------------UP AND DOWN QDC MEANS--------------------//
             
@@ -295,6 +297,7 @@ int main(int argc, char *argv[]) {
             
 
             c->Close();
+            */
         }
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));

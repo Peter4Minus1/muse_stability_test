@@ -14,6 +14,10 @@
 #include "dataclasses.h"
 
 //------------------HIST-------------------------//
+Hist::Hist(){
+    means = {};
+    errors = {};
+}
 
 void Hist::set_means(std::vector<float> a) {means = a;}
 void Hist::set_errors(std::vector<float> a) {errors = a;}
@@ -24,6 +28,13 @@ std::vector<float> Hist::get_errors() {return errors;}
 int Hist::size() {return means.size();}
 
 //------------------UPDOWN-------------------------//
+UpDown::UpDown(){
+    ratios = {};
+    products = {};
+
+    up = Hist();
+    down = Hist();
+}
 
 void UpDown::set_ratios() {
     ratios = {};
@@ -55,16 +66,40 @@ std::vector<float> UpDown::std_err(char type) {
 	return sd;
 }
 
+Hist UpDown::_up() {return up;}
+Hist UpDown::_down() {return down;}
+
 //------------------PROFILE-------------------------//
+Profile::Profile(){
+    R_values = {};
+}
 
 std::vector<float> Profile::get_R() {return R_values;}
 void Profile::set_R(std::vector<float> a) {R_values = a;}
+
+//------------------QDC--------------------------//
+QDC::QDC(){
+    trig = UpDown();
+}
+UpDown QDC::_trig(){
+    return trig;
+}
+//------------------GAIN-------------------------//
+Gain::Gain(){
+    profile_ratio = Profile();
+}
+Profile Gain::_profile_ratio(){
+    return profile_ratio;
+}
 
 //------------------DETECTOR-------------------------//
 
 Detector::Detector(){
     name = "SPSLF";
     front = true;
+
+    qdc = QDC();
+    gain = Gain();
 }
 
 Detector::Detector(std::string _name, bool _front) {
@@ -75,15 +110,17 @@ Detector::Detector(std::string _name, bool _front) {
 bool Detector::isFront(){return front;}
 std::string Detector::get_name(){return name;}
 
+QDC Detector::getQdc(){return qdc;}
+Gain Detector::getGain(){return gain;}
+
 //------------------RUN-------------------------//
 
 Run::Run(int num) {
     run_num = num;
-    SPSLF = Detector("SPSLF", true);
-    SPSRF = Detector("SPSRF", true);
-    SPSLR = Detector("SPSLR", false);
-    SPSRR = Detector("SPSRR", false);
-    SPS = {SPSLF, SPSRF, SPSLR, SPSRR};
+    SPS[0] = new Detector("SPSLF", true);
+    SPS[1] = new Detector("SPSRF", true);
+    SPS[2] = new Detector("SPSLR", false);
+    SPS[3] = new Detector("SPSRR", false);
 
 }
 
@@ -91,9 +128,9 @@ void Run::set_data(std::string directory) {
     std::string file_name = directory + Form("/run%d.root", run_num);
     TFile* datafile = new TFile(file_name.c_str(), "READ");
 
-    for(int d = 0; d < SPS.size(); d++) {
+    for(int d = 0; d < 4; d++) {
 
-        Detector detector = SPS[d];
+        Detector* detector = SPS[d];
 
         std::vector<float> up = {};
         std::vector<float> down = {};
@@ -102,9 +139,9 @@ void Run::set_data(std::string directory) {
         std::vector<float> R_att = {};
 
         int length;
-        const char* name_ptr = detector.get_name().data();
+        const char* name_ptr = detector->get_name().data();
 
-        if (detector.isFront()) {
+        if (detector->isFront()) {
             length = 18;
         } else {
             length = 28;
@@ -123,13 +160,13 @@ void Run::set_data(std::string directory) {
             d_err.push_back(hist_down->GetMean(11));
         }
 
-        detector.qdc.trig.up.set_means(up);
-        detector.qdc.trig.down.set_means(down);
-        detector.qdc.trig.up.set_errors(u_err);
-        detector.qdc.trig.down.set_errors(d_err);
+        detector->getQdc()._trig()._up().set_means(up);
+        detector->getQdc()._trig()._down().set_means(down);
+        detector->getQdc()._trig()._up().set_errors(u_err);
+        detector->getQdc()._trig()._down().set_errors(d_err);
 
-        detector.qdc.trig.set_ratios();
-        detector.qdc.trig.set_products();
+        detector->getQdc()._trig().set_ratios();
+        detector->getQdc()._trig().set_products();
 
         //Gain
 
@@ -141,7 +178,7 @@ void Run::set_data(std::string directory) {
                 R = 1.0;
             } else {
                 double r;
-                if (detector.isFront()){
+                if (detector->isFront()){
                     r = g->Eval(60.0);
                 } else {
                     r = g->Eval(110.0);
@@ -152,7 +189,7 @@ void Run::set_data(std::string directory) {
             R_att.push_back(R);
         }
 
-        detector.gain.profile_ratio.set_R(R_att);
+        detector->getGain()._profile_ratio().set_R(R_att);
     }
    
     datafile->Close();
