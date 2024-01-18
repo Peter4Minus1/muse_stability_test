@@ -55,17 +55,7 @@ int main(int argc, char *argv[]) {
     }
     
     for (int i = 0; i < runs.size(); i++){
-        std::cout << runs[i].get_number();
         runs[i].set_data(directory);
-        std::cout << runs[i].SPS[0]->get_name();
-        std::cout << runs[i].SPS[0]->qdc.test;
-        std::cout << runs[i].SPS[0]->qdc.trig.test;
-        std::cout << runs[i].SPS[0]->qdc.trig.up.test;
-        std::cout << runs[i].SPS[0]->qdc.test2;
-        std::cout << runs[i].SPS[0]->qdc.trig.up.test2;
-
-        
-        std::cout << runs[i].SPS[0]->qdc.trig.down.get_means()[0];
     }
     const int n = runs.size();
 
@@ -134,7 +124,7 @@ int main(int argc, char *argv[]) {
 
                 
             }
-            /*
+            
 
             //-------------------UP AND DOWN QDC MEANS--------------------//
             
@@ -164,8 +154,8 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < runs.size(); i++) {
                 this_run = runs[i];
                 x[i] = this_run.get_number();
-                ratios[i] = this_run.SPS[d].qdc.trig.get_ratios()[b];
-                ratio_err[i] = this_run.SPS[d].qdc.trig.std_err('r')[b];
+                ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
+                ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
             }
             gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
             gr1->SetMarkerSize(.5);
@@ -201,7 +191,7 @@ int main(int argc, char *argv[]) {
             std::vector<float> null_runs = {};
             for (int i = 0; i < runs.size(); i++){
                 this_run = runs[i];
-                float Rx = this_run.SPS[d].gain.profile_ratio.get_R()[b];
+                float Rx = this_run.SPS[d]->gain.profile_ratio.get_R()[b];
                 if (Rx == 1.0){
                     null_data.push_back(0.0);
                     null_runs.push_back(this_run.get_number());
@@ -213,7 +203,7 @@ int main(int argc, char *argv[]) {
                         bad_runs.push_back(this_run.get_number());
                         errorLog << Form("%s,%d,%02d,R attenuation,|R| > 10%%\n", ds, this_run.get_number(),b);
                     }
-                    R[i] = this_run.SPS[d].gain.profile_ratio.get_R()[b];
+                    R[i] = this_run.SPS[d]->gain.profile_ratio.get_R()[b];
                     x_valid[i] = this_run.get_number();
                 }
             }
@@ -306,7 +296,7 @@ int main(int argc, char *argv[]) {
             
 
             c->Close();
-            */
+            
         }
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));

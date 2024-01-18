@@ -171,12 +171,6 @@ void Run::set_data(std::string directory) {
         detector->qdc.trig.set_ratios();
         detector->qdc.trig.set_products();
 
-        detector->qdc.test = "1";
-        detector->qdc.trig.test = "2";
-        detector->qdc.trig.up.test = "3";
-        detector->qdc.test2 = "4";
-        detector->qdc.trig.up.test2 = "5";
-
         //Gain
 
         for (int bar = 0; bar < length; bar++) {

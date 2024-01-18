@@ -29,8 +29,6 @@ public:
     std::vector<float> get_means();
     std::vector<float> get_errors();
     //std::vector<float> get_maxbins();
-    std::string test;
-    std::string test2;
 
     int size();
 };
@@ -54,7 +52,6 @@ public:
     std::vector<float> get_products();
     
     std::vector<float> std_err(char type);    
-    std::string test;
 };
 
 class Profile {
@@ -74,8 +71,6 @@ class QDC {
         //UpDown QDC_ped;
 //    public:
         QDC();
-        std::string test;
-        std::string test2;
         
         //UpDown _trig();
 };
