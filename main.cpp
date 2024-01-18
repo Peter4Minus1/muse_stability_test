@@ -55,8 +55,17 @@ int main(int argc, char *argv[]) {
     }
     
     for (int i = 0; i < runs.size(); i++){
+        std::cout << runs[i].get_number();
         runs[i].set_data(directory);
-        std::cout << runs[i].SPS[0]->getQdc()._trig()._down().get_means()[0];
+        std::cout << runs[i].SPS[0]->get_name();
+        std::cout << runs[i].SPS[0]->qdc.test;
+        std::cout << runs[i].SPS[0]->qdc.trig.test;
+        std::cout << runs[i].SPS[0]->qdc.trig.up.test;
+        std::cout << runs[i].SPS[0]->qdc.test2;
+        std::cout << runs[i].SPS[0]->qdc.trig.up.test2;
+
+        
+        std::cout << runs[i].SPS[0]->qdc.trig.down.get_means()[0];
     }
     const int n = runs.size();
 
@@ -111,14 +120,14 @@ int main(int argc, char *argv[]) {
                 x[i] = this_run.get_number();
                 std::cout << x[i];
 
-                up[i] = this_run.SPS[d]->getQdc()._trig()._up().get_means()[b];
-                up_err[i] = this_run.SPS[d]->getQdc()._trig()._up().get_errors()[b];
+                up[i] = this_run.SPS[d]->qdc.trig.up.get_means()[b];
+                up_err[i] = this_run.SPS[d]->qdc.trig.up.get_errors()[b];
 
                 std::cout << up[i];
                 std::cout << up_err[i];
 
-                down[i] = this_run.SPS[d]->getQdc()._trig()._down().get_means()[b];
-                down_err[i] = this_run.SPS[d]->getQdc()._trig()._down().get_errors()[b];
+                down[i] = this_run.SPS[d]->qdc.trig.down.get_means()[b];
+                down_err[i] = this_run.SPS[d]->qdc.trig.down.get_errors()[b];
 
                 std::cout << down[i];
                 std::cout << down_err[i];

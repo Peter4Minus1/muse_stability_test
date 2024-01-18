@@ -66,8 +66,8 @@ std::vector<float> UpDown::std_err(char type) {
 	return sd;
 }
 
-Hist UpDown::_up() {return up;}
-Hist UpDown::_down() {return down;}
+//Hist UpDown::_up() {return up;}
+//Hist UpDown::_down() {return down;}
 
 //------------------PROFILE-------------------------//
 Profile::Profile(){
@@ -81,16 +81,16 @@ void Profile::set_R(std::vector<float> a) {R_values = a;}
 QDC::QDC(){
     trig = UpDown();
 }
-UpDown QDC::_trig(){
-    return trig;
-}
+//UpDown QDC::_trig(){
+//    return trig;
+//}
 //------------------GAIN-------------------------//
 Gain::Gain(){
     profile_ratio = Profile();
 }
-Profile Gain::_profile_ratio(){
-    return profile_ratio;
-}
+//Profile Gain::_profile_ratio(){
+//    return profile_ratio;
+//}
 
 //------------------DETECTOR-------------------------//
 
@@ -113,8 +113,8 @@ Detector::Detector(std::string _name, bool _front) {
 bool Detector::isFront(){return front;}
 std::string Detector::get_name(){return name;}
 
-QDC Detector::getQdc(){return qdc;}
-Gain Detector::getGain(){return gain;}
+//QDC Detector::getQdc(){return qdc;}
+//Gain Detector::getGain(){return gain;}
 
 //------------------RUN-------------------------//
 
@@ -163,13 +163,19 @@ void Run::set_data(std::string directory) {
             d_err.push_back(hist_down->GetMean(11));
         }
 
-        detector->getQdc()._trig()._up().set_means(up);
-        detector->getQdc()._trig()._down().set_means(down);
-        detector->getQdc()._trig()._up().set_errors(u_err);
-        detector->getQdc()._trig()._down().set_errors(d_err);
+        detector->qdc.trig.up.set_means(up);
+        detector->qdc.trig.down.set_means(down);
+        detector->qdc.trig.up.set_errors(u_err);
+        detector->qdc.trig.down.set_errors(d_err);
 
-        detector->getQdc()._trig().set_ratios();
-        detector->getQdc()._trig().set_products();
+        detector->qdc.trig.set_ratios();
+        detector->qdc.trig.set_products();
+
+        detector->qdc.test = "1";
+        detector->qdc.trig.test = "2";
+        detector->qdc.trig.up.test = "3";
+        detector->qdc.test2 = "4";
+        detector->qdc.trig.up.test2 = "5";
 
         //Gain
 
@@ -192,7 +198,7 @@ void Run::set_data(std::string directory) {
             R_att.push_back(R);
         }
 
-        detector->getGain()._profile_ratio().set_R(R_att);
+        detector->gain.profile_ratio.set_R(R_att);
     }
    
     datafile->Close();

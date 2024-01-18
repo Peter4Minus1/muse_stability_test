@@ -29,6 +29,8 @@ public:
     std::vector<float> get_means();
     std::vector<float> get_errors();
     //std::vector<float> get_maxbins();
+    std::string test;
+    std::string test2;
 
     int size();
 };
@@ -37,15 +39,14 @@ class UpDown {
 private:
     std::vector<float> ratios;
     std::vector<float> products;
-
+public:
     Hist up;
     Hist down;
     
-public:
     UpDown();
 
-    Hist _up();
-    Hist _down();
+    //Hist _up();
+    //Hist _down();
     void set_ratios();
     void set_products();
     
@@ -53,6 +54,7 @@ public:
     std::vector<float> get_products();
     
     std::vector<float> std_err(char type);    
+    std::string test;
 };
 
 class Profile {
@@ -66,38 +68,41 @@ public:
 
 
 class QDC {
-    private:
+    public:
         //UpDown raw;
         UpDown trig;
         //UpDown QDC_ped;
-    public:
+//    public:
         QDC();
+        std::string test;
+        std::string test2;
         
-        UpDown _trig();
+        //UpDown _trig();
 };
 
 class Gain {
-    private:
-        Profile profile_ratio;
     public:
+        Profile profile_ratio;
+    //public:
         Gain();
-        Profile _profile_ratio();
+        //Profile _profile_ratio();
 };
 
 class Detector{
     private:
         std::string name;
         bool front;
+    public:
 
         Gain gain;
         QDC qdc;
-    public:
+    //public:
         Detector();
         Detector(std::string name, bool front);
 
 
-        Gain getGain();
-        QDC getQdc();
+        //Gain getGain();
+        //QDC getQdc();
         
         bool isFront();
         std::string get_name();
@@ -108,8 +113,8 @@ private:
     int run_num;
 
 public:
-    Run(int num);
     Detector* SPS[4];
+    Run(int num);
     void set_run(int n);
     int get_number();
     void set_data(std::string directory);
