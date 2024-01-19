@@ -79,8 +79,6 @@ int main(int argc, char *argv[]) {
 
         const int n = runs.size();
 
-        std::vector<float> errs = {};
-
         //QDC this_qdc = this_run.SPS[d].qdc;
         //Gain this_gain = this_run.SPS[d].gain;
 
@@ -108,21 +106,12 @@ int main(int argc, char *argv[]) {
                 this_run = Run(runs[i]);
 
                 x[i] = this_run.get_number();
-                std::cout << x[i];
 
                 up[i] = this_run.SPS[d]->qdc.trig.up.get_means()[b];
                 up_err[i] = this_run.SPS[d]->qdc.trig.up.get_errors()[b];
 
-                std::cout << up[i];
-                std::cout << up_err[i];
-
                 down[i] = this_run.SPS[d]->qdc.trig.down.get_means()[b];
                 down_err[i] = this_run.SPS[d]->qdc.trig.down.get_errors()[b];
-
-                std::cout << down[i];
-                std::cout << down_err[i];
-
-                
             }
             
 
@@ -135,12 +124,14 @@ int main(int argc, char *argv[]) {
             gr1->SetLineWidth(1);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21);
+            gr1->SetMarkerColor(kRed);
 
             auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
             gr2->SetName("down");
-            gr2->SetLineColorAlpha(kBlue, 0.5);
+            gr2->SetLineColor(kBlue);
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
+            gr2->SetMarkerColor(kBlue);
 
             auto qdc_folder = bar_folder->mkdir("QDC", "QDC");
             qdc_folder->WriteObject(gr1, "Up" );
@@ -166,25 +157,11 @@ int main(int argc, char *argv[]) {
 
         //---------------------------------GAIN R ATTENUATION-----------------------------//
 
-            auto gain_folder = bar_folder->mkdir("Gain", "Gain");
-
-            float sum=0;
-            for (int i = 0; i < runs.size(); i++) {
-                sum = sum + up[i];
-            }
-            float mean = sum/bars;
-            float Sr = 0;
-            for (int i = 0; i < runs.size(); i++) {
-                Sr = Sr + pow(mean-up[i], 2);
-            }
-            float stddev = pow(Sr/bars, 0.5);
-            float err = stddev/pow(bars, 0.5);
-            errs.push_back(err);            
-
+            auto gain_folder = bar_folder->mkdir("Gain", "Gain");    
 
         //Sort good runs from the bad runs
-            float_t x_valid[n];
-            float_t R[n];
+            std::vector<float> good_runs= {};
+            std::vector<float> good_data = {};
             std::vector<float> bad_runs = {};
             std::vector<float> bad_data = {};
             std::vector<float> null_data = {};
@@ -203,10 +180,13 @@ int main(int argc, char *argv[]) {
                         bad_runs.push_back(this_run.get_number());
                         errorLog << Form("%s,%d,%02d,R attenuation,|R| > 10%%\n", ds, this_run.get_number(),b);
                     }
-                    R[i] = this_run.SPS[d]->gain.profile_ratio.get_R()[b];
-                    x_valid[i] = this_run.get_number();
+                    good_data.push_back(this_run.SPS[d]->gain.profile_ratio.get_R()[b]);
+                    good_runs.push_back(this_run.get_number());
                 }
             }
+            const int n1 = good_data.size();
+            float_t x_valid[n1];
+            float_t R[n1];
             const int n2 = bad_data.size();
             float_t x2[n2];
             float_t y2[n2];
@@ -214,6 +194,10 @@ int main(int argc, char *argv[]) {
             float_t x3[n3];
             float_t y3[n3];
 
+            for (int i = 0; i < n1; i++) {
+                x_valid[i] = good_runs[i];
+                R[i] = good_data[i];
+            }
             for (int i = 0; i < n2; i++) {
                 x2[i] = bad_runs[i];
                 y2[i] = bad_data[i];
@@ -259,7 +243,7 @@ int main(int argc, char *argv[]) {
             //----------------------------------CENTERED R ATTENUATION------------------------------//
 
             c = new TCanvas("c", "Centered at 0");
-            sum = 0;
+            float sum = 0;
             int count = 0;
             for (int i = 0; i < n;i++){
                 if (typeid(R[i]) != typeid(nullptr)){
@@ -267,7 +251,7 @@ int main(int argc, char *argv[]) {
                     count++;
                 }
             }
-            mean = sum/count;
+            float mean = sum/count;
 
             for (int i=0; i<n; i++){
                 if (typeid(R[i]) != typeid(nullptr)){
