@@ -226,7 +226,7 @@ int main(int argc, char *argv[]) {
             mg->Add(gr3);
             
 
-            gr1 = new TGraphErrors(n, x_valid, R, nullptr, nullptr);
+            gr1 = new TGraphErrors(n1, x_valid, R, nullptr, nullptr);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("QDC Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
@@ -259,7 +259,7 @@ int main(int argc, char *argv[]) {
                 }
             }
 
-            gr1 = new TGraphErrors(n, x, R, nullptr, nullptr);
+            gr1 = new TGraphErrors(n1, x_valid, R, nullptr, nullptr);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21);
 
