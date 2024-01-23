@@ -120,6 +120,7 @@ int main(int argc, char *argv[]) {
             auto mg = new TMultiGraph();
             auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
             gr1->SetName("up");
+            gr1->SetTitle(Form("Mean QDC Up %s Bar %02d;Run;QDC", ds, b));
             gr1->SetLineColor(kRed);
             gr1->SetLineWidth(1);
             gr1->SetMarkerSize(.5);
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
 
             auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
             gr2->SetName("down");
+            gr2->SetTitle(Form("Mean QDC Diwn %s Bar %02d;Run;QDC", ds, b));
             gr2->SetLineColor(kBlue);
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
@@ -151,7 +153,7 @@ int main(int argc, char *argv[]) {
             gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
-            gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %d;Run;QDC Ratio", ds, b));
+            gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %02d;Run;QDC Ratio", ds, b));
 
             qdc_folder->WriteObject(gr1, "ratios");
 
@@ -229,7 +231,7 @@ int main(int argc, char *argv[]) {
             gr1 = new TGraphErrors(n1, x_valid, R, nullptr, nullptr);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
-            gr1->SetTitle(Form("QDC Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
+            gr1->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
             mg->Add(gr1);
             mg->SetMinimum(-.11);
             mg->SetMaximum(.11);
@@ -245,7 +247,7 @@ int main(int argc, char *argv[]) {
             c = new TCanvas("c", "Centered at 0");
             float sum = 0;
             int count = 0;
-            for (int i = 0; i < n;i++){
+            for (int i = 0; i < n1;i++){
                 if (typeid(R[i]) != typeid(nullptr)){
                     sum = sum + R[i];
                     count++;
