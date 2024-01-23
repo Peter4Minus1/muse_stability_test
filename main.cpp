@@ -255,7 +255,7 @@ int main(int argc, char *argv[]) {
             }
             float mean = sum/count;
 
-            for (int i=0; i<n; i++){
+            for (int i=0; i<n1; i++){
                 if (typeid(R[i]) != typeid(nullptr)){
                     R[i] = R[i]-mean;
                 }
