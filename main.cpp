@@ -308,21 +308,25 @@ int main(int argc, char *argv[]) {
         grA->SetMarkerSize(.5);
         grA->SetMarkerStyle(21);
         grA->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+        ped_folder->WriteObject(grA, "Up Positions");
 
         auto grB = new TGraphErrors(n, x, up_w, nullptr, nullptr);
         grB->SetMarkerSize(.5);
         grB->SetMarkerStyle(21);
         grB->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+        ped_folder->WriteObject(grB, "Up Widths");
 
         auto grC = new TGraphErrors(n, x, down_p, nullptr, nullptr);
         grC->SetMarkerSize(.5);
         grC->SetMarkerStyle(21);
         grC->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+        ped_folder->WriteObject(grC, "Down Positions");
 
         auto grD = new TGraphErrors(n, x, down_w, nullptr, nullptr);
         grD->SetMarkerSize(.5);
         grD->SetMarkerStyle(21);
         grD->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+        ped_folder->WriteObject(grD, "Down Widths");
 
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
