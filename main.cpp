@@ -16,6 +16,7 @@
 #include <TMultiGraph.h>
 #include <TLegend.h>
 #include <TProfile.h>
+#include <TMatrixD.h>
 #include "dataclasses.h"
 
 int main(int argc, char *argv[]) {
@@ -89,9 +90,11 @@ int main(int argc, char *argv[]) {
             bars = 28;
         }
 
+        float_t x[n];
+
         for (int b = 0; b < bars; b++) {
 
-            float_t x[n];
+            x[n];
 
             float_t up[n];
             float_t up_err[n];
@@ -129,7 +132,7 @@ int main(int argc, char *argv[]) {
 
             auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
             gr2->SetName("down");
-            gr2->SetTitle(Form("Mean QDC Diwn %s Bar %02d;Run;QDC", ds, b));
+            gr2->SetTitle(Form("Mean QDC Down %s Bar %02d;Run;QDC", ds, b));
             gr2->SetLineColor(kBlue);
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
@@ -279,11 +282,48 @@ int main(int argc, char *argv[]) {
             leg->Draw();
 
             gain_folder->WriteObject(c, "Mean_Centered");
-            
 
             c->Close();
-            
         }
+
+        //--------------------PEDESTAL----------------------------//
+        
+
+        auto ped_folder = AllGraphs->mkdir("Pedestal", "Pedestal");
+
+        float_t up_p[n];
+        float_t up_w[n];
+        float_t down_p[n];
+        float_t down_w[n];
+        
+        for (int i = 0; i < n; i++){
+            up_p[i] = this_run.SPS[d]->ped.getUpPositions()[i];
+            up_w[i] = this_run.SPS[d]->ped.getUpWidths()[i];
+            down_p[i] = this_run.SPS[d]->ped.getDownPositions()[i];
+            down_w[i] = this_run.SPS[d]->ped.getDownWidths()[i];
+            x[i] = this_run.get_number();
+        }
+
+        auto grA = new TGraphErrors(n, x, up_p, nullptr, nullptr);
+        grA->SetMarkerSize(.5);
+        grA->SetMarkerStyle(21);
+        grA->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+
+        auto grB = new TGraphErrors(n, x, up_w, nullptr, nullptr);
+        grB->SetMarkerSize(.5);
+        grB->SetMarkerStyle(21);
+        grB->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+
+        auto grC = new TGraphErrors(n, x, down_p, nullptr, nullptr);
+        grC->SetMarkerSize(.5);
+        grC->SetMarkerStyle(21);
+        grC->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+
+        auto grD = new TGraphErrors(n, x, down_w, nullptr, nullptr);
+        grD->SetMarkerSize(.5);
+        grD->SetMarkerStyle(21);
+        grD->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
     }

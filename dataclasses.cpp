@@ -11,6 +11,7 @@
 #include <TCanvas.h>
 #include <TMultiGraph.h>
 #include <TProfile.h>
+#include <TMatrixD.h>
 #include "dataclasses.h"
 
 //------------------HIST-------------------------//
@@ -91,6 +92,29 @@ Gain::Gain(){
 //Profile Gain::_profile_ratio(){
 //    return profile_ratio;
 //}
+//------------------PEDESTAL-------------------------//
+Pedestal::Pedestal(){
+    upPositions = {};
+    downPositions = {};
+    upWidths = {};
+    downWidths = {};
+}
+
+void Pedestal::setPositions(std::vector<float> up, std::vector<float> down){
+    upPositions = up;
+    downPositions = down;
+}
+
+void Pedestal::setWidths(std::vector<float> up, std::vector<float> down){
+    upWidths = up;
+    downWidths = down;
+}
+
+std::vector<float> Pedestal::getUpPositions() {return upPositions;}
+std::vector<float> Pedestal::getUpWidths() {return upWidths;}
+std::vector<float> Pedestal::getDownPositions() {return downPositions;}
+std::vector<float> Pedestal::getDownWidths() {return downWidths;}
+
 
 //------------------DETECTOR-------------------------//
 
@@ -193,6 +217,22 @@ void Run::set_data(std::string directory) {
         }
 
         detector->gain.profile_ratio.set_R(R_att);
+
+        //Pedestal
+        std::vector<float> u_pos = {};
+        std::vector<float> u_w = {};
+        std::vector<float> d_pos = {};
+        std::vector<float> d_w = {};
+        TMatrixD* m = (TMatrixD*) datafile->Get(Form("%s_calib", name_ptr));
+        for (int bar = 0; bar < length; bar++){
+            u_pos.push_back((*m)(bar,0));
+            u_w.push_back((*m)(bar,1));
+            d_pos.push_back((*m)(bar,2));
+            d_w.push_back((*m)(bar,3));
+        }
+
+        detector->ped.setPositions(u_pos, d_pos);
+        detector->ped.setWidths(u_w, d_w);
     }
    
     datafile->Close();

@@ -11,6 +11,7 @@
 #include <TCanvas.h>
 #include <TMultiGraph.h>
 #include <TProfile.h>
+#include <TMatrixD.h>
 
 class Hist {
 
@@ -68,7 +69,7 @@ class QDC {
     public:
         //UpDown raw;
         UpDown trig;
-        //UpDown QDC_ped;
+        UpDown pedestal;
 //    public:
         QDC();
         
@@ -83,12 +84,28 @@ class Gain {
         //Profile _profile_ratio();
 };
 
+class Pedestal{
+    private:
+        std::vector<float> upPositions;
+        std::vector<float> upWidths;
+        std::vector<float> downPositions;
+        std::vector<float> downWidths;
+    public:
+        Pedestal();
+        void setPositions(std::vector<float> up, std::vector<float> down);
+        void setWidths(std::vector<float> up, std::vector<float> down);
+        std::vector<float> getUpPositions();
+        std::vector<float> getUpWidths();
+        std::vector<float> getDownPositions();
+        std::vector<float> getDownWidths();
+};
+
 class Detector{
     private:
         std::string name;
         bool front;
     public:
-
+        Pedestal ped;
         Gain gain;
         QDC qdc;
     //public:
