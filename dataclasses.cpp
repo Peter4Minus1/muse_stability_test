@@ -225,10 +225,12 @@ void Run::set_data(std::string directory) {
         std::vector<float> d_w = {};
         TMatrixD* m = (TMatrixD*) datafile->Get(Form("%s_calib", name_ptr));
         for (int bar = 0; bar < length; bar++){
-            u_pos.push_back((*m)(bar,0));
-            u_w.push_back((*m)(bar,1));
-            d_pos.push_back((*m)(bar,2));
-            d_w.push_back((*m)(bar,3));
+            if(m){
+                u_pos.push_back((*m)(bar,0));
+                u_w.push_back((*m)(bar,1));
+                d_pos.push_back((*m)(bar,2));
+                d_w.push_back((*m)(bar,3));
+            }
         }
 
         detector->ped.setPositions(u_pos, d_pos);

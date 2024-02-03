@@ -150,8 +150,10 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < runs.size(); i++) {
                 this_run = runs[i];
                 x[i] = this_run.get_number();
-                ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
-                ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
+                if (this_run.SPS[d]->qdc.trig.down.get_means()[i] != 0){
+                    ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
+                    ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
+                }
             }
             gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
             gr1->SetMarkerSize(.5);
@@ -235,7 +237,9 @@ int main(int argc, char *argv[]) {
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
+            gain_folder->WriteObject(gr1, "Raw R Values");
             mg->Add(gr1);
+
             mg->SetMinimum(-.11);
             mg->SetMaximum(.11);
             mg->Draw("AP");
