@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < runs.size(); i++) {
                 this_run = runs[i];
                 x[i] = this_run.get_number();
-                if (this_run.SPS[d]->qdc.trig.down.get_means()[i] != 0){
+                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] != 0){
                     ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
                     ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
                 }
@@ -301,11 +301,11 @@ int main(int argc, char *argv[]) {
         float_t down_w[n];
         
         for (int i = 0; i < n; i++){
-            up_p[i] = this_run.SPS[d]->ped.getUpPositions()[i];
-            up_w[i] = this_run.SPS[d]->ped.getUpWidths()[i];
-            down_p[i] = this_run.SPS[d]->ped.getDownPositions()[i];
-            down_w[i] = this_run.SPS[d]->ped.getDownWidths()[i];
-            x[i] = this_run.get_number();
+            up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[i];
+            up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[i];
+            down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[i];
+            down_w[i] = runs[i].SPS[d]->ped.getDownWidths()[i];
+            x[i] = runs[i].get_number();
         }
 
         auto grA = new TGraphErrors(n, x, up_p, nullptr, nullptr);
