@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
         //--------------------PEDESTAL----------------------------//
         
 
-        auto ped_folder = AllGraphs->mkdir("Pedestal", "Pedestal");
+        auto ped_folder = detector_folder->mkdir("Pedestal", "Pedestal");
 
         float_t up_p[n];
         float_t up_w[n];
