@@ -297,6 +297,7 @@ int main(int argc, char *argv[]) {
             float_t down_w[n];
 
             for (int i = 0; i < n; i++){
+                std::cout << runs[i].SPS[d]->ped.getUpPositions()[b];
                 up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
                 up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[b];
                 down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[b];
