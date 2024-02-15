@@ -298,14 +298,36 @@ int main(int argc, char *argv[]) {
 
             for (int i = 0; i < n; i++){
                 std::cout << "Run " << runs[i].get_number() << " bar " << b << std::endl;
-                up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
-                up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[b];
-                down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[b];
-                down_w[i] = runs[i].SPS[d]->ped.getDownWidths()[b];
+                try {
+                    up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
+                } catch(...) {
+                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Up Position Invalid\n";
+                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Up Position invalid";
+                }
+
+                try{
+                    up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[b];
+                } catch(...) {
+                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Up Width Invalid\n";
+                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Up width invalid";
+                }   
+
+                try {
+                    down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[b];
+                } catch(...) {
+                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Down Position Invalid\n";
+                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Down Position invalid";
+                }
+
+                try{
+                    down_w[i] = runs[i].SPS[d]->ped.getDownWidths()[b];
+                } catch(...) {
+                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Down Width Invalid\n";
+                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Down Width invalid";
+                }
                 x[i] = runs[i].get_number();
             }
 
-            /*
             auto grA = new TGraphErrors(n, x, up_p, nullptr, nullptr);
             grA->SetMarkerSize(.5);
             grA->SetMarkerStyle(21);
@@ -331,7 +353,6 @@ int main(int argc, char *argv[]) {
             ped_folder->WriteObject(grD, "Down Widths");
             
             c->Close();
-            */
         }
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
