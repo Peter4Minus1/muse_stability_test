@@ -288,8 +288,7 @@ int main(int argc, char *argv[]) {
             gain_folder->WriteObject(c, "Mean_Centered");
 
         //--------------------PEDESTAL----------------------------//
-        /*
-        
+                
             auto ped_folder = bar_folder->mkdir("Pedestal", "Pedestal");
 
             float_t up_p[n];
@@ -306,6 +305,7 @@ int main(int argc, char *argv[]) {
                 x[i] = runs[i].get_number();
             }
 
+            /*
             auto grA = new TGraphErrors(n, x, up_p, nullptr, nullptr);
             grA->SetMarkerSize(.5);
             grA->SetMarkerStyle(21);
