@@ -297,7 +297,6 @@ int main(int argc, char *argv[]) {
             float_t down_w[n];
 
             for (int i = 0; i < n; i++){
-                std::cout << "Run " << runs[i].get_number() << " bar " << b << std::endl;
                 try {
                     up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
                 } catch(...) {
