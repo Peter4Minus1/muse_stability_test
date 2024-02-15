@@ -288,6 +288,7 @@ int main(int argc, char *argv[]) {
             gain_folder->WriteObject(c, "Mean_Centered");
 
         //--------------------PEDESTAL----------------------------//
+        /*
         
             auto ped_folder = bar_folder->mkdir("Pedestal", "Pedestal");
 
@@ -297,7 +298,7 @@ int main(int argc, char *argv[]) {
             float_t down_w[n];
 
             for (int i = 0; i < n; i++){
-                std::cout << runs[i].SPS[d]->ped.getUpPositions()[b];
+                std::cout << i << b << std::endl;
                 up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
                 up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[b];
                 down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[b];
@@ -330,6 +331,7 @@ int main(int argc, char *argv[]) {
             ped_folder->WriteObject(grD, "Down Widths");
             
             c->Close();
+            */
         }
     
     //c1->SaveAs(Form("%s%ss.pdf", ds, calculation.c_str()));
