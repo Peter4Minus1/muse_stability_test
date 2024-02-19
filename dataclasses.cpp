@@ -115,6 +115,8 @@ std::vector<float> Pedestal::getUpWidths() {return upWidths;}
 std::vector<float> Pedestal::getDownPositions() {return downPositions;}
 std::vector<float> Pedestal::getDownWidths() {return downWidths;}
 
+void Pedestal::setValidity(bool a){validity = a;}
+bool Pedestal::isValid() {return validity;}
 
 //------------------DETECTOR-------------------------//
 
@@ -224,13 +226,16 @@ void Run::set_data(std::string directory) {
         std::vector<float> d_pos = {};
         std::vector<float> d_w = {};
         TMatrixD* m = (TMatrixD*) datafile->Get(Form("%s_calib", name_ptr));
-        for (int bar = 0; bar < length; bar++){
-            if(m){
+        if(m){    
+            detector->ped.setValidity(true);
+            for (int bar = 0; bar < length; bar++){
                 u_pos.push_back((*m)(bar,0));
                 u_w.push_back((*m)(bar,1));
                 d_pos.push_back((*m)(bar,2));
-                d_w.push_back((*m)(bar,3));
+                d_w.push_back((*m)(bar,3));  
             }
+        } else {
+            detector->ped.setValidity(true);
         }
 
         detector->ped.setPositions(u_pos, d_pos);

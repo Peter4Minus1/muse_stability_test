@@ -86,6 +86,7 @@ class Gain {
 
 class Pedestal{
     private:
+        bool validity;
         std::vector<float> upPositions;
         std::vector<float> upWidths;
         std::vector<float> downPositions;
@@ -98,6 +99,9 @@ class Pedestal{
         std::vector<float> getUpWidths();
         std::vector<float> getDownPositions();
         std::vector<float> getDownWidths();
+
+        void setValidity(bool a);
+        bool isValid();
 };
 
 class Detector{
@@ -125,6 +129,8 @@ private:
     int run_num;
 
 public:
+    bool valid_pedestal;
+
     Detector* SPS[4];
     Run(int num);
     void set_run(int n);

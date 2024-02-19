@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < runs.size(); i++) {
                 this_run = runs[i];
                 x[i] = this_run.get_number();
-                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] != 0){
+                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] >= 1){
                     ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
                     ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
                 }
@@ -298,34 +298,17 @@ int main(int argc, char *argv[]) {
 
             for (int i = 0; i < n; i++){
                 std::cout << "Run " << runs[i].get_number() << " bar " << b << std::endl;
-                try {
+                if (runs[i].SPS[d]->ped.isValid()){
                     up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
-                } catch(...) {
-                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Up Position Invalid\n";
-                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Up Position invalid";
-                }
-
-                try{
                     up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[b];
-                } catch(...) {
-                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Up Width Invalid\n";
-                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Up width invalid";
-                }   
-
-                try {
                     down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[b];
-                } catch(...) {
-                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Down Position Invalid\n";
-                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Down Position invalid";
-                }
-
-                try{
                     down_w[i] = runs[i].SPS[d]->ped.getDownWidths()[b];
-                } catch(...) {
-                    errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << ",Pedestal,Down Width Invalid\n";
-                    std::cout << "Run " << this_run.get_number() << " bar " << b << " Pedestal Down Width invalid";
+                    x[i] = runs[i].get_number();
+                } else if (b == 0){
+                    errorLog << ds << "," << this_run.get_number() << ",-,Pedestal,Pedestal Not Found\n";
+                    std::cout << "Run " << this_run.get_number() << " Pedestal invalid";
                 }
-                x[i] = runs[i].get_number();
+                
             }
 
             auto grA = new TGraphErrors(n, x, up_p, nullptr, nullptr);
