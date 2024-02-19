@@ -235,7 +235,7 @@ void Run::set_data(std::string directory) {
                 d_w.push_back((*m)(bar,3));  
             }
         } else {
-            detector->ped.setValidity(true);
+            detector->ped.setValidity(false);
         }
 
         detector->ped.setPositions(u_pos, d_pos);
