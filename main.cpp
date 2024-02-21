@@ -303,28 +303,28 @@ int main(int argc, char *argv[]) {
             for (int i = 0; i < n; i++){
                 if (runs[i].SPS[d]->ped.isValid()){
                     temp = runs[i].SPS[d]->ped.getUpPositions()[b];
-                    if (temp < 1000 && temp >= 1){
+                    if (temp < 1000 && temp >= 1 && !(isnan(temp))){
                         up_p[i] = temp;
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Up Position\n";
                     }
 
                     temp = runs[i].SPS[d]->ped.getUpWidths()[b];
-                    if (temp < 1000 && temp >= 1){
+                    if (temp < 1000 && temp >= 1 && !(isnan(temp))){
                         up_w[i] = temp;
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Up Width\n";
                     }
 
                     temp = runs[i].SPS[d]->ped.getDownPositions()[b];
-                    if (temp < 1000 && temp >= 1){
+                    if (temp < 1000 && temp >= 1 && !(isnan(temp))){
                         down_p[i] = temp;
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Down Position\n";
                     }
 
                     temp = runs[i].SPS[d]->ped.getDownWidths()[b];
-                    if (temp < 1000 && temp >=1){
+                    if (temp < 1000 && temp >=1 && !(isnan(temp))){
                         down_w[i] = temp;
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Down Width\n";
