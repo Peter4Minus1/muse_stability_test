@@ -309,6 +309,7 @@ int main(int argc, char *argv[]) {
             float_t temp;
 
             for (int i = 0; i < n; i++){
+                this_run = runs[i];
                 if (runs[i].SPS[d]->ped.isValid()){
                     temp = runs[i].SPS[d]->ped.getUpPositions()[b];
                     if (temp < 1000 && temp >= 1 && !(isnan(temp))){
