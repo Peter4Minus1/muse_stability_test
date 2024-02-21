@@ -251,9 +251,12 @@ int Run::get_number() {return run_num;}
 
 //-------------------MISC----------------------//
 
-void convert(std::vector<float> a, float_t *b, int n)
+float_t* convert(std::vector<float> v)
 {
-    for (int i=0; i<n; i++) {
-        b[i] = a[i];
+    const int n = v.size();
+    float_t* a = new float_t[n];
+    for (int i = 0; i < n; i++) {
+        a[i] = v[i];
     }
+    return a;
 }

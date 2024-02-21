@@ -138,5 +138,5 @@ public:
     void set_data(std::string directory);
 };
 
-void convert(std::vector<float> v, float_t* a, int n);
+float_t* convert(std::vector<float> v);
 
