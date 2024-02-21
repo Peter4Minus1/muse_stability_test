@@ -294,26 +294,26 @@ int main(int argc, char *argv[]) {
                 
             auto ped_folder = bar_folder->mkdir("Pedestal", "Pedestal");
 
-            float_t up_p[n];
+            std::vector<float> up_p;
             std::vector<float> x_up;
 
-            float_t up_w[n];
+            std::vector<float> up_w;
             std::vector<float> x_uw;
 
-            float_t down_p[n];
+            std::vector<float> down_p;
             std::vector<float> x_dp;
 
-            float_t down_w[n];
+            std::vector<float> down_w;
             std::vector<float> x_dw;
 
-            float_t temp;
+            float temp;
 
             for (int i = 0; i < n; i++){
                 this_run = runs[i];
                 if (runs[i].SPS[d]->ped.isValid()){
                     temp = runs[i].SPS[d]->ped.getUpPositions()[b];
                     if (temp < 1000 && temp >= 1 && !(isnan(temp))){
-                        up_p[i] = temp;
+                        up_p.push_back(temp);
                         x_up.push_back(this_run.get_number());
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Up Position\n";
@@ -321,7 +321,7 @@ int main(int argc, char *argv[]) {
 
                     temp = runs[i].SPS[d]->ped.getUpWidths()[b];
                     if (temp < 1000 && temp >= 1 && !(isnan(temp))){
-                        up_w[i] = temp;
+                        up_w.push_back(temp);
                         x_uw.push_back(this_run.get_number());
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Up Width\n";
@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
 
                     temp = runs[i].SPS[d]->ped.getDownPositions()[b];
                     if (temp < 1000 && temp >= 1 && !(isnan(temp))){
-                        down_p[i] = temp;
+                        down_p.push_back(temp);
                         x_dp.push_back(this_run.get_number());
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Down Position\n";
@@ -337,7 +337,7 @@ int main(int argc, char *argv[]) {
 
                     temp = runs[i].SPS[d]->ped.getDownWidths()[b];
                     if (temp < 1000 && temp >=1 && !(isnan(temp))){
-                        down_w[i] = temp;
+                        down_w.push_back(temp);
                         x_dw.push_back(this_run.get_number());
                     } else {
                         errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Down Width\n";
@@ -349,25 +349,25 @@ int main(int argc, char *argv[]) {
                 
             }
 
-            auto grA = new TGraphErrors(n, convert(x_up), up_p, nullptr, nullptr);
+            auto grA = new TGraphErrors(n, convert(x_up), convert(up_p), nullptr, nullptr);
             grA->SetMarkerSize(.5);
             grA->SetMarkerStyle(21);
             grA->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
             ped_folder->WriteObject(grA, "Up Positions");
 
-            auto grB = new TGraphErrors(n, convert(x_uw), up_w, nullptr, nullptr);
+            auto grB = new TGraphErrors(n, convert(x_uw), convert(up_w), nullptr, nullptr);
             grB->SetMarkerSize(.5);
             grB->SetMarkerStyle(21);
             grB->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
             ped_folder->WriteObject(grB, "Up Widths");
 
-            auto grC = new TGraphErrors(n, convert(x_dp), down_p, nullptr, nullptr);
+            auto grC = new TGraphErrors(n, convert(x_dp), convert(down_p), nullptr, nullptr);
             grC->SetMarkerSize(.5);
             grC->SetMarkerStyle(21);
             grC->SetTitle(Form("QDC Pedestal Position Down %s;Run;QDC", ds));
             ped_folder->WriteObject(grC, "Down Positions");
 
-            auto grD = new TGraphErrors(n, convert(x_dw), down_w, nullptr, nullptr);
+            auto grD = new TGraphErrors(n, convert(x_dw), convert(down_w), nullptr, nullptr);
             grD->SetMarkerSize(.5);
             grD->SetMarkerStyle(21);
             grD->SetTitle(Form("QDC Pedestal Width Down %s;Run;QDC", ds));
