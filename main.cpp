@@ -146,13 +146,16 @@ int main(int argc, char *argv[]) {
 
             float_t ratios[n];
             float_t ratio_err[n];
+            x[n];
 
             for (int i = 0; i < runs.size(); i++) {
                 this_run = runs[i];
-                x[i] = this_run.get_number();
-                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] >= 1){
+                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] >= 1 && this_run.SPS[d]->qdc.trig.up.get_means()[b] >= 1){
+                    x[i] = this_run.get_number();
                     ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
                     ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
+                } else {
+                    errorLog << ds <<"," << this_run.get_number() << "," << b << ",Ratios,Up or Down Value close to 0\n";
                 }
             }
             gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
@@ -295,14 +298,37 @@ int main(int argc, char *argv[]) {
             float_t up_w[n];
             float_t down_p[n];
             float_t down_w[n];
+            float_t temp;
 
             for (int i = 0; i < n; i++){
-                std::cout << "Run " << runs[i].get_number() << " bar " << b << std::endl;
                 if (runs[i].SPS[d]->ped.isValid()){
-                    up_p[i] = runs[i].SPS[d]->ped.getUpPositions()[b];
-                    up_w[i] = runs[i].SPS[d]->ped.getUpWidths()[b];
-                    down_p[i] = runs[i].SPS[d]->ped.getDownPositions()[b];
-                    down_w[i] = runs[i].SPS[d]->ped.getDownWidths()[b];
+                    temp = runs[i].SPS[d]->ped.getUpPositions()[b];
+                    if (temp < 1000 && temp >= 1){
+                        up_p[i] = temp;
+                    } else {
+                        errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Up Position\n";
+                    }
+
+                    temp = runs[i].SPS[d]->ped.getUpWidths()[b];
+                    if (temp < 1000 && temp >= 1){
+                        up_w[i] = temp;
+                    } else {
+                        errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Up Width\n";
+                    }
+
+                    temp = runs[i].SPS[d]->ped.getDownPositions()[b];
+                    if (temp < 1000 && temp >= 1){
+                        down_p[i] = temp;
+                    } else {
+                        errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Down Position\n";
+                    }
+
+                    temp = runs[i].SPS[d]->ped.getDownWidths()[b];
+                    if (temp < 1000 && temp >=1){
+                        down_w[i] = temp;
+                    } else {
+                        errorLog << ds << "," << this_run.get_number() << "," << Form("%02d", b) << "," << "Pedestal,Invalid Down Width\n";
+                    }
                     x[i] = runs[i].get_number();
                 } else if (b == 0){
                     errorLog << ds << "," << this_run.get_number() << ",-,Pedestal,Pedestal Not Found\n";
@@ -326,13 +352,13 @@ int main(int argc, char *argv[]) {
             auto grC = new TGraphErrors(n, x, down_p, nullptr, nullptr);
             grC->SetMarkerSize(.5);
             grC->SetMarkerStyle(21);
-            grC->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+            grC->SetTitle(Form("QDC Pedestal Position Down %s;Run;QDC", ds));
             ped_folder->WriteObject(grC, "Down Positions");
 
             auto grD = new TGraphErrors(n, x, down_w, nullptr, nullptr);
             grD->SetMarkerSize(.5);
             grD->SetMarkerStyle(21);
-            grD->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+            grD->SetTitle(Form("QDC Pedestal Width Down %s;Run;QDC", ds));
             ped_folder->WriteObject(grD, "Down Widths");
             
             c->Close();
