@@ -150,7 +150,7 @@ int main(int argc, char *argv[]) {
 
             for (int i = 0; i < runs.size(); i++) {
                 this_run = runs[i];
-                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] >= 1 && this_run.SPS[d]->qdc.trig.up.get_means()[b] >= 1){
+                if (this_run.SPS[d]->qdc.trig.down.get_means()[b] >= 1.0 && this_run.SPS[d]->qdc.trig.up.get_means()[b] >= 1.0){
                     x[i] = this_run.get_number();
                     ratios[i] = this_run.SPS[d]->qdc.trig.get_ratios()[b];
                     ratio_err[i] = this_run.SPS[d]->qdc.trig.std_err('r')[b];
