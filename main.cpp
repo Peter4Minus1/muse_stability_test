@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
                 this_run = runs[i];
                 if (runs[i].SPS[d]->ped.isValid()){
                     temp = runs[i].SPS[d]->ped.getUpPositions()[b];
-                    if (temp < 1000 && temp >= 1 && !(isnan(temp))){
+                    if (temp < 1000 && temp >= 1 && !(isnan(temp)) && temp != nullptr){
                         up_p.push_back(temp);
                         x_up.push_back(this_run.get_number());
                     } else {
@@ -320,7 +320,7 @@ int main(int argc, char *argv[]) {
                     }
 
                     temp = runs[i].SPS[d]->ped.getUpWidths()[b];
-                    if (temp < 1000 && temp >= 1 && !(isnan(temp))){
+                    if (temp < 1000 && temp >= 1 && !(isnan(temp)) && temp != nullptr){
                         up_w.push_back(temp);
                         x_uw.push_back(this_run.get_number());
                     } else {
@@ -328,7 +328,7 @@ int main(int argc, char *argv[]) {
                     }
 
                     temp = runs[i].SPS[d]->ped.getDownPositions()[b];
-                    if (temp < 1000 && temp >= 1 && !(isnan(temp))){
+                    if (temp < 1000 && temp >= 1 && !(isnan(temp)) && temp != nullptr){
                         down_p.push_back(temp);
                         x_dp.push_back(this_run.get_number());
                     } else {
@@ -336,7 +336,7 @@ int main(int argc, char *argv[]) {
                     }
 
                     temp = runs[i].SPS[d]->ped.getDownWidths()[b];
-                    if (temp < 1000 && temp >=1 && !(isnan(temp))){
+                    if (temp < 1000 && temp >=1 && !(isnan(temp)) && temp != nullptr){
                         down_w.push_back(temp);
                         x_dw.push_back(this_run.get_number());
                     } else {
