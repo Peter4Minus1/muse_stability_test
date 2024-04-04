@@ -127,8 +127,6 @@ int main(int argc, char *argv[]) {
             auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
             gr1->SetName("up");
             gr1->SetTitle(Form("Mean QDC Up %s Bar %02d;Run;QDC", ds, b));
-            gr1->SetLineColor(kRed);
-            gr1->SetLineWidth(1);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21);
             gr1->SetMarkerColor(kRed);
@@ -140,7 +138,6 @@ int main(int argc, char *argv[]) {
             auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
             gr2->SetName("down");
             gr2->SetTitle(Form("Mean QDC Down %s Bar %02d;Run;QDC", ds, b));
-            gr2->SetLineColor(kBlue);
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
             gr2->SetMarkerColor(kBlue);
@@ -169,6 +166,8 @@ int main(int argc, char *argv[]) {
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %02d;Run;QDC Ratio", ds, b));
+            gr1->SetMinimum(0);
+            gr1->SetMaximum(2);
             gr1->Draw("AP");
 
             qdc_folder->WriteObject(c, "ratios");
