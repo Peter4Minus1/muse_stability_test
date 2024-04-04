@@ -16,7 +16,7 @@
 struct Datapoint{
     int x;
     float y;
-}
+};
 
 class Hist {
 
