@@ -13,6 +13,11 @@
 #include <TProfile.h>
 #include <TMatrixD.h>
 
+struct Datapoint{
+    int x;
+    float y;
+}
+
 class Hist {
 
 private:
@@ -58,6 +63,7 @@ public:
 class Profile {
 private:
     std::vector<float> R_values;
+    std::vector<float> centered_R;
 public:
     Profile();
     std::vector<float> get_R();
@@ -139,4 +145,5 @@ public:
 };
 
 float_t* convert(std::vector<float> v);
+float_t* convert(std::vector<Datapoint> v, char id);
 

@@ -129,6 +129,7 @@ int main(int argc, char *argv[]) {
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21);
             gr1->SetMarkerColor(kRed);
+            gr1->Draw("AP");
 
             auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
             gr2->SetName("down");
@@ -137,6 +138,7 @@ int main(int argc, char *argv[]) {
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
             gr2->SetMarkerColor(kBlue);
+            gr2->Draw("AP");
 
             auto qdc_folder = bar_folder->mkdir("QDC", "QDC");
             qdc_folder->WriteObject(gr1, "Up" );
@@ -162,6 +164,7 @@ int main(int argc, char *argv[]) {
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %02d;Run;QDC Ratio", ds, b));
+            gr1->Draw("AP");
 
             qdc_folder->WriteObject(gr1, "ratios");
 
@@ -353,24 +356,28 @@ int main(int argc, char *argv[]) {
             grA->SetMarkerSize(.5);
             grA->SetMarkerStyle(21);
             grA->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+            grA->Draw("AP");
             ped_folder->WriteObject(grA, "Up Positions");
 
             auto grB = new TGraphErrors(x_uw.size(), convert(x_uw), convert(up_w), nullptr, nullptr);
             grB->SetMarkerSize(.5);
             grB->SetMarkerStyle(21);
             grB->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+            grB->Draw("AP");
             ped_folder->WriteObject(grB, "Up Widths");
 
             auto grC = new TGraphErrors(x_dp.size(), convert(x_dp), convert(down_p), nullptr, nullptr);
             grC->SetMarkerSize(.5);
             grC->SetMarkerStyle(21);
             grC->SetTitle(Form("QDC Pedestal Position Down %s;Run;QDC", ds));
+            grC->Draw("AP");
             ped_folder->WriteObject(grC, "Down Positions");
 
             auto grD = new TGraphErrors(x_dw.size(), convert(x_dw), convert(down_w), nullptr, nullptr);
             grD->SetMarkerSize(.5);
             grD->SetMarkerStyle(21);
             grD->SetTitle(Form("QDC Pedestal Width Down %s;Run;QDC", ds));
+            grD->Draw("AP");
             ped_folder->WriteObject(grD, "Down Widths");
             
             c->Close();
