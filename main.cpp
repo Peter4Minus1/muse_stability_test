@@ -119,6 +119,9 @@ int main(int argc, char *argv[]) {
             
 
             //-------------------UP AND DOWN QDC MEANS--------------------//
+
+            auto qdc_folder = bar_folder->mkdir("QDC", "QDC");
+            auto c = new TCanvas("c", "QDC Up");
             
             auto mg = new TMultiGraph();
             auto gr1 = new TGraphErrors(n, x, up, nullptr, up_err);
@@ -130,7 +133,10 @@ int main(int argc, char *argv[]) {
             gr1->SetMarkerStyle(21);
             gr1->SetMarkerColor(kRed);
             gr1->Draw("AP");
+            qdc_folder->WriteObject(c, "Up" );
+            c->Close();
 
+            c = new TCanvas("c", "QDC Down");
             auto gr2 = new TGraphErrors(n, x, down, nullptr, down_err);
             gr2->SetName("down");
             gr2->SetTitle(Form("Mean QDC Down %s Bar %02d;Run;QDC", ds, b));
@@ -139,10 +145,8 @@ int main(int argc, char *argv[]) {
             gr2->SetMarkerStyle(21);
             gr2->SetMarkerColor(kBlue);
             gr2->Draw("AP");
-
-            auto qdc_folder = bar_folder->mkdir("QDC", "QDC");
-            qdc_folder->WriteObject(gr1, "Up" );
-            qdc_folder->WriteObject(gr2, "Down");
+            qdc_folder->WriteObject(c, "Down");
+            c->Close();
         
         //--------------------------QDC UP/DOWN RATIOS---------------------//
 
@@ -160,13 +164,15 @@ int main(int argc, char *argv[]) {
                     errorLog << ds <<"," << this_run.get_number() << "," << b << ",Ratios,Up or Down Value close to 0\n";
                 }
             }
+            c = new TCanvas("c", "QDC Ratios");
             gr1 = new TGraphErrors(n, x, ratios, nullptr, ratio_err);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("QDC Up/Down Ratio %s Bar %02d;Run;QDC Ratio", ds, b));
             gr1->Draw("AP");
 
-            qdc_folder->WriteObject(gr1, "ratios");
+            qdc_folder->WriteObject(c, "ratios");
+            c->Close();
 
         //---------------------------------GAIN R ATTENUATION-----------------------------//
 
@@ -221,7 +227,7 @@ int main(int argc, char *argv[]) {
             }
 
             //-------------------R ATTENUATION------------------------------///
-            auto c = new TCanvas("c", "R Attenuation values");
+            c = new TCanvas("c", "R Attenuation values");
             mg = new TMultiGraph();
             mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
 
@@ -352,12 +358,17 @@ int main(int argc, char *argv[]) {
                 
             }
 
+            c = new TCanvas("c", "QDC Pedestal UpPos");
+
             auto grA = new TGraphErrors(x_up.size(), convert(x_up), convert(up_p), nullptr, nullptr);
             grA->SetMarkerSize(.5);
             grA->SetMarkerStyle(21);
             grA->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
             grA->Draw("AP");
             ped_folder->WriteObject(grA, "Up Positions");
+            c->Close();
+
+            c = new TCanvas("c", "QDC Pedestal UpWid");
 
             auto grB = new TGraphErrors(x_uw.size(), convert(x_uw), convert(up_w), nullptr, nullptr);
             grB->SetMarkerSize(.5);
@@ -365,6 +376,9 @@ int main(int argc, char *argv[]) {
             grB->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
             grB->Draw("AP");
             ped_folder->WriteObject(grB, "Up Widths");
+            c->Close();
+
+            c = new TCanvas("c", "QDC Pedestal DownPos");
 
             auto grC = new TGraphErrors(x_dp.size(), convert(x_dp), convert(down_p), nullptr, nullptr);
             grC->SetMarkerSize(.5);
@@ -372,6 +386,9 @@ int main(int argc, char *argv[]) {
             grC->SetTitle(Form("QDC Pedestal Position Down %s;Run;QDC", ds));
             grC->Draw("AP");
             ped_folder->WriteObject(grC, "Down Positions");
+            c->Close();
+
+            c = new TCanvas("c", "QDC Pedestal DownWid");
 
             auto grD = new TGraphErrors(x_dw.size(), convert(x_dw), convert(down_w), nullptr, nullptr);
             grD->SetMarkerSize(.5);
