@@ -130,6 +130,7 @@ int main(int argc, char *argv[]) {
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21);
             gr1->SetMarkerColor(kRed);
+            gr1->SetLineColor(kRed);
             gr1->Draw("AP");
             qdc_folder->WriteObject(c, "Up" );
             c->Close();
@@ -141,6 +142,7 @@ int main(int argc, char *argv[]) {
             gr2->SetMarkerSize(.5);
             gr2->SetMarkerStyle(21);
             gr2->SetMarkerColor(kBlue);
+            gr2->SetLineColor(kBlue);
             gr2->Draw("AP");
             qdc_folder->WriteObject(c, "Down");
             c->Close();
@@ -297,6 +299,7 @@ int main(int argc, char *argv[]) {
             leg->Draw();
 
             gain_folder->WriteObject(c, "Mean_Centered");
+            c->Close();
 
         //--------------------PEDESTAL----------------------------//
                 
@@ -362,9 +365,9 @@ int main(int argc, char *argv[]) {
             auto grA = new TGraphErrors(x_up.size(), convert(x_up), convert(up_p), nullptr, nullptr);
             grA->SetMarkerSize(.5);
             grA->SetMarkerStyle(21);
-            grA->SetTitle(Form("QDC Pedestal Position Up %s;Run;QDC", ds));
+            grA->SetTitle(Form("QDC Pedestal Position Up %s Bar %02d;Run;QDC", ds, b));
             grA->Draw("AP");
-            ped_folder->WriteObject(grA, "Up Positions");
+            ped_folder->WriteObject(c, "Up Positions");
             c->Close();
 
             c = new TCanvas("c", "QDC Pedestal UpWid");
@@ -372,9 +375,9 @@ int main(int argc, char *argv[]) {
             auto grB = new TGraphErrors(x_uw.size(), convert(x_uw), convert(up_w), nullptr, nullptr);
             grB->SetMarkerSize(.5);
             grB->SetMarkerStyle(21);
-            grB->SetTitle(Form("QDC Pedestal Width Up %s;Run;QDC", ds));
+            grB->SetTitle(Form("QDC Pedestal Width Up %s Bar %02d;Run;QDC", ds, b));
             grB->Draw("AP");
-            ped_folder->WriteObject(grB, "Up Widths");
+            ped_folder->WriteObject(c, "Up Widths");
             c->Close();
 
             c = new TCanvas("c", "QDC Pedestal DownPos");
@@ -382,9 +385,9 @@ int main(int argc, char *argv[]) {
             auto grC = new TGraphErrors(x_dp.size(), convert(x_dp), convert(down_p), nullptr, nullptr);
             grC->SetMarkerSize(.5);
             grC->SetMarkerStyle(21);
-            grC->SetTitle(Form("QDC Pedestal Position Down %s;Run;QDC", ds));
+            grC->SetTitle(Form("QDC Pedestal Position Down %s Bar %02d;Run;QDC", ds, b));
             grC->Draw("AP");
-            ped_folder->WriteObject(grC, "Down Positions");
+            ped_folder->WriteObject(c, "Down Positions");
             c->Close();
 
             c = new TCanvas("c", "QDC Pedestal DownWid");
@@ -392,9 +395,9 @@ int main(int argc, char *argv[]) {
             auto grD = new TGraphErrors(x_dw.size(), convert(x_dw), convert(down_w), nullptr, nullptr);
             grD->SetMarkerSize(.5);
             grD->SetMarkerStyle(21);
-            grD->SetTitle(Form("QDC Pedestal Width Down %s;Run;QDC", ds));
+            grD->SetTitle(Form("QDC Pedestal Width Down %s Bar %02d;Run;QDC", ds, b));
             grD->Draw("AP");
-            ped_folder->WriteObject(grD, "Down Widths");
+            ped_folder->WriteObject(c, "Down Widths");
             
             c->Close();
         }
