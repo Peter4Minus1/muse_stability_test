@@ -228,7 +228,6 @@ int main(int argc, char *argv[]) {
             }
 
             //-------------------R ATTENUATION------------------------------///
-            c = new TCanvas("c", "R Attenuation values");
             mg = new TMultiGraph();
             mg->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
 
@@ -246,13 +245,18 @@ int main(int argc, char *argv[]) {
             mg->Add(gr3);
             
 
+            c = new TCanvas("c", "Raw R");
             gr1 = new TGraphErrors(n1, x_valid, R, nullptr, nullptr);
             gr1->SetMarkerSize(.5);
             gr1->SetMarkerStyle(21); 
             gr1->SetTitle(Form("Gain Attenuation R Values %s Bar %d;Run;R value", ds, b));
-            gain_folder->WriteObject(gr1, "Raw R Values");
+            gr1->Draw("AP");
+            
+            gain_folder->WriteObject(c, "Raw_R_Values");
+            c->Close();
             mg->Add(gr1);
 
+            c = new TCanvas("c", "R Attenuation values");
             mg->SetMinimum(-.11);
             mg->SetMaximum(.11);
             mg->Draw("AP");
