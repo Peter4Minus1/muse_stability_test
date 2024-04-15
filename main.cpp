@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
         //std::cout << r;
         std::string filename = directory + Form("/run%d.root", r);
         TFile f(filename.c_str());
-        if (!(f.IsZombie())) {
+        if (!(f.IsZombie()) && ) {
             runs.push_back(Run(r));
         } 
         f.Close();
